@@ -53,7 +53,7 @@ public class MessagesProcessor
 
 	private async Task ProcessStartMessageAsync(Update update, UserData user)
 	{
-		var states = await _frameStateLogic.GetStartStateForUser(update, user);
+		var states = _frameStateLogic.GetStartStateForUser(update, user);
 		foreach (var currentState in states)
 		{
 			if (currentState.Ikm != null)

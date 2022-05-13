@@ -33,7 +33,7 @@ public class Worker : IHostedService
 			{
 				using var scope = _serviceProvider.CreateAsyncScope();
 				var callbackQueryProcessor = scope.ServiceProvider.GetService(typeof(CallbackQueryProcessor)) as CallbackQueryProcessor;
-				//await callbackQueryProcessor.ProcessCallbackQuery(update);
+				await callbackQueryProcessor.ProcessCallbackQuery(update);
 			}
 		}
 		catch (Exception e)

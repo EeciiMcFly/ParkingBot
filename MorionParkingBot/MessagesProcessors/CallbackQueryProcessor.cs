@@ -1,9 +1,7 @@
-﻿using System.Text;
-using MorionParkingBot.Database;
+﻿using MorionParkingBot.Database;
 using MorionParkingBot.Users;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MorionParkingBot.MessagesProcessors;
 
@@ -14,54 +12,63 @@ public class CallbackQueryProcessor
 	private readonly ParkingRequestQueue _parkingRequestQueue;
 	private readonly StateService _stateService;
 	private readonly ChatId _myChatId = new("340612851");
+	
+	private readonly FrameStateLogic _frameStateLogic;
 
 	public CallbackQueryProcessor(TelegramBotClient telegramBotClient, 
 		IUsersService usersService,
 		ParkingRequestQueue parkingRequestQueue, 
-		StateService stateService)
+		StateService stateService, 
+		FrameStateLogic frameStateLogic)
 	{
 		_telegramBotClient = telegramBotClient;
 		_usersService = usersService;
 		_parkingRequestQueue = parkingRequestQueue;
 		_stateService = stateService;
+		_frameStateLogic = frameStateLogic;
 	}
 	
-	// public async Task ProcessCallbackQuery(Update update)
-	// {
-	// 	var user = await _usersService.GetOrCreateUserAsync(update.CallbackQuery.From.Id);
-	//
-	// 	if (!_stateService.IsActive)
-	// 	{
-	// 		var paymentMessage = "К сожалению бот сейчас не активен";
-	// 		await _telegramBotClient.SendTextMessageAsync(update.CallbackQuery.From.Id, paymentMessage);
-	// 		
-	// 		return;
-	// 	}
-	// 	
-	// 	switch (update.CallbackQuery.Data)
-	// 	{
-	// 		case CallbackDataConstants.FindParkingQuery:
-	// 			await ProcessFindParkingAsync(update, user);
-	// 			break;
-	//
-	// 		case CallbackDataConstants.InfoAboutPayment:
-	// 			await ProcessInfoAboutPayment(update, user);
-	//
-	// 			break;
-	//
-	// 		case CallbackDataConstants.GeneratePaymentRequest:
-	// 			await ProcessGeneratePaymentAsync(update, user);
-	// 			break;
-	//
-	// 		case CallbackDataConstants.BackToMainMenu:
-	// 			await ProcessBackToMainMenu(update, user);
-	// 			break;
-	//
-	// 		default:
-	// 			break;
-	// 	}
-	// }
-	//
+	public async Task ProcessCallbackQuery(Update update)
+	{
+		var user = await _usersService.GetOrCreateUserAsync(update.CallbackQuery.From.Id);
+
+		switch (update.CallbackQuery.Data)
+		{
+			case CallbackDataConstants.ActivateCode:
+				await ProcessActivateCode(update, user);
+				break;
+			// case CallbackDataConstants.FindParkingQuery:
+			// 	await ProcessFindParkingAsync(update, user);
+			// 	break;
+			//
+			// case CallbackDataConstants.InfoAboutPayment:
+			// 	await ProcessInfoAboutPayment(update, user);
+			//
+			// 	break;
+			//
+			// case CallbackDataConstants.GeneratePaymentRequest:
+			// 	await ProcessGeneratePaymentAsync(update, user);
+			// 	break;
+			//
+			// case CallbackDataConstants.BackToMainMenu:
+			// 	await ProcessBackToMainMenu(update, user);
+			// 	break;
+	
+			default:
+				break;
+		}
+	}
+
+	private async Task ProcessActivateCode(Update update, UserData user)
+	{
+		var states = _frameStateLogic.GetActivateCodeStateForUser(update, user);
+		foreach (var currentState in states)
+		{
+			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
+			 		currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
+		}
+	}
+
 	// private async Task ProcessBackToMainMenu(Update update, UserData user, string text = "Нажми кнопку и бот найдет парковочное место")
 	// {
 	// 	var ikm = new InlineKeyboardMarkup(new[]

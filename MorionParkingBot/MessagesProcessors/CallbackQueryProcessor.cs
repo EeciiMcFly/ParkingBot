@@ -10,21 +10,18 @@ public class CallbackQueryProcessor
 	private readonly TelegramBotClient _telegramBotClient;
 	private readonly IUsersService _usersService;
 	private readonly ParkingRequestQueue _parkingRequestQueue;
-	private readonly StateService _stateService;
 	private readonly ChatId _myChatId = new("340612851");
 	
 	private readonly FrameStateLogic _frameStateLogic;
 
 	public CallbackQueryProcessor(TelegramBotClient telegramBotClient, 
 		IUsersService usersService,
-		ParkingRequestQueue parkingRequestQueue, 
-		StateService stateService, 
+		ParkingRequestQueue parkingRequestQueue,
 		FrameStateLogic frameStateLogic)
 	{
 		_telegramBotClient = telegramBotClient;
 		_usersService = usersService;
 		_parkingRequestQueue = parkingRequestQueue;
-		_stateService = stateService;
 		_frameStateLogic = frameStateLogic;
 	}
 	

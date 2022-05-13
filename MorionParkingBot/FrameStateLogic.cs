@@ -61,4 +61,22 @@ public class FrameStateLogic
 			update.CallbackQuery.Message.MessageId);
 		return new List<FrameState> {states};
 	}
+
+	public List<FrameState> GetPromoCodeNotExistStateForUser(Update update, UserData user)
+	{
+		var state = _frameStateConstructor.ConstructPromoCodeNotExistFrame(update.Message.Chat.Id);
+		return new List<FrameState> {state};
+	}
+
+	public List<FrameState> GetPromoCodeAlreadyActivatedStateForUser(Update update, UserData user)
+	{
+		var state = _frameStateConstructor.ConstructPromoCodeAlreadyActivatedFrame(update.Message.Chat.Id);
+		return new List<FrameState> {state};
+	}
+
+	public List<FrameState> GetPromoCodeActivatedStateForUser(Update update, UserData user)
+	{
+		var state = _frameStateConstructor.ConstructPromoCodeActivatedFrame(update.Message.Chat.Id);
+		return state;
+	}
 }

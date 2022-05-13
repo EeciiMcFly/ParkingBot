@@ -11,4 +11,10 @@ public static class MessageConstants
 
 	public const string ActiveLicenseInfoUseCode =
 		"У вас активна подписка. Оставшееся количество дней: {0}. Вы можете ввести промокод для продления лицензии.";
+
+	public const string PromoCodeNotExist = "Некорректный промокод. Попробуйте еще раз.";
+
+	public const string PromoCodeAlreadyActivated = "Промокод уже активирован. Попробуйте другой.";
+
+	public const string PromoCodeActivated = "Промокод успешно активирован. Ваша лицензия обновлена.";
 }

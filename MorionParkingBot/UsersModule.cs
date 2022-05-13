@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MorionParkingBot.Database;
 using MorionParkingBot.MessagesProcessors;
+using MorionParkingBot.PromoCodes;
 using MorionParkingBot.Users;
 using Telegram.Bot;
 
@@ -55,10 +56,6 @@ public class UsersModule : Module
 			.As<ParkingRequestQueue>()
 			.SingleInstance();
 
-		builder.RegisterType<StateService>()
-			.As<StateService>()
-			.SingleInstance();
-
 		builder.RegisterType<FrameStateLogic>()
 			.As<FrameStateLogic>()
 			.SingleInstance();
@@ -66,5 +63,23 @@ public class UsersModule : Module
 		builder.RegisterType<FrameStateConstructor>()
 			.As<FrameStateConstructor>()
 			.SingleInstance();
+
+		builder.Register(c =>
+			{
+				var configuration = c.Resolve<IConfiguration>();
+				var connectionString = configuration.GetConnectionString("DatabaseConnectionTemplateWithoutDbName");
+
+				var optionsBuilder = new DbContextOptionsBuilder<PromoCodeDbContext>();
+				optionsBuilder.UseNpgsql(connectionString);
+			
+				var dbContext = new PromoCodeDbContext(optionsBuilder.Options);
+				return new PromoCodeRepository(dbContext);
+			})
+			.As<IPromoCodeRepository>()
+			.InstancePerLifetimeScope();
+
+		builder.RegisterType<PromoCodeService>()
+			.As<IPromoCodeService>()
+			.InstancePerLifetimeScope();
 	}
 }

@@ -143,4 +143,77 @@ public class FrameStateConstructor
 
 		return frameState;
 	}
+
+	public FrameState ConstructPromoCodeNotExistFrame(long chatId)
+	{
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu)
+			}
+		});
+
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.PromoCodeNotExist,
+			Ikm = ikm
+		};
+
+		return frameState;
+	}
+
+	public FrameState ConstructPromoCodeAlreadyActivatedFrame(long chatId)
+	{
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu)
+			}
+		});
+
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.PromoCodeAlreadyActivated,
+			Ikm = ikm
+		};
+
+		return frameState;
+	}
+
+	public List<FrameState> ConstructPromoCodeActivatedFrame(long chatId)
+	{
+		var firstFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.PromoCodeActivated,
+		};
+
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
+				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}
+		});
+
+		var secondFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.StartMessage,
+			Ikm = ikm
+		};
+
+		var frameStateList = new List<FrameState>
+		{
+			firstFrameState,
+			secondFrameState
+		};
+
+		return frameStateList;
+	}
 }

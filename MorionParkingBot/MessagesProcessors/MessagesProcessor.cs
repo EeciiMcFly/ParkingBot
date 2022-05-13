@@ -56,8 +56,11 @@ public class MessagesProcessor
 		var states = await _frameStateLogic.GetStartStateForUser(update, user);
 		foreach (var currentState in states)
 		{
-			await _telegramBotClient.SendTextMessageAsync(currentState.ChatId, currentState.MessageText,
+			if (currentState.Ikm != null)
+				await _telegramBotClient.SendTextMessageAsync(currentState.ChatId, currentState.MessageText,
 				replyMarkup: currentState.Ikm);
+			else
+				await _telegramBotClient.SendTextMessageAsync(currentState.ChatId, currentState.MessageText);
 		}
 	}
 	//

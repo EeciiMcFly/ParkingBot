@@ -24,7 +24,7 @@ namespace MorionParkingBot.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LicenseInfo",
+                name: "LicenseInfos",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -34,9 +34,9 @@ namespace MorionParkingBot.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LicenseInfo", x => x.Id);
+                    table.PrimaryKey("PK_LicenseInfos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LicenseInfo_Users_UserId",
+                        name: "FK_LicenseInfos_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -44,13 +44,13 @@ namespace MorionParkingBot.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_LicenseInfo_Id",
-                table: "LicenseInfo",
+                name: "IX_LicenseInfos_Id",
+                table: "LicenseInfos",
                 column: "Id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LicenseInfo_UserId",
-                table: "LicenseInfo",
+                name: "IX_LicenseInfos_UserId",
+                table: "LicenseInfos",
                 column: "UserId",
                 unique: true);
 
@@ -63,7 +63,7 @@ namespace MorionParkingBot.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "LicenseInfo");
+                name: "LicenseInfos");
 
             migrationBuilder.DropTable(
                 name: "Users");

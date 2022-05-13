@@ -14,7 +14,7 @@ public class FrameStateLogic
 
 	public async Task<List<FrameState>> GetStartStateForUser(Update update, UserData user)
 	{
-		var isLicenseActive = user.LicenseInfo.ExpirationTime > DateTime.Now;
+		var isLicenseActive = user.LicenseInfo.ExpirationTime > DateTime.UtcNow;
 
 		if (isLicenseActive)
 		{

@@ -28,9 +28,10 @@ public class UsersService : IUsersService
 			{
 				UserId = createdUser.Id,
 				User = createdUser,
-				ExpirationTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0)
+				ExpirationTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0, DateTimeKind.Utc)
 			};
 
+			await _usersRepository.AddNewLicenseAsync(newLicenseInfo);
 			createdUser.LicenseInfo = newLicenseInfo;
 			await _usersRepository.UpdateUserAsync(createdUser);
 			user = createdUser;

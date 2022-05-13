@@ -31,20 +31,6 @@ public class UsersModule : Module
 		
 		builder.Register(c =>
 			{
-				var configuration = c.Resolve<IConfiguration>();
-				var connectionString = configuration.GetConnectionString("DatabaseConnectionTemplateWithoutDbName");
-
-				var optionsBuilder = new DbContextOptionsBuilder<LicenseDbContext>();
-				optionsBuilder.UseNpgsql(connectionString);
-			
-				var dbContext = new LicenseDbContext(optionsBuilder.Options);
-				return new LicenseRepository(dbContext);
-			})
-			.As<ILicenseRepository>()
-			.InstancePerLifetimeScope();
-
-		builder.Register(c =>
-			{
 				var telegramBotClient = new TelegramBotClient("5257347533:AAH_EZtoPXtadAkchdMbCzP-h6t4SQhLjFc");
 				//var telegramBotClient = new TelegramBotClient("5225586467:AAH4AKYDeJc0tIaBggMv_Arhz3uVx7giJK8");
 				

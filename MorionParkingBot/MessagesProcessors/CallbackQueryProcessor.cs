@@ -37,6 +37,10 @@ public class CallbackQueryProcessor
 			case CallbackDataConstants.ActivateCode:
 				await ProcessActivateCode(update, user);
 				break;
+			
+			case CallbackDataConstants.BackToMainMenu:
+				await ProcessBackToMainMenu(update, user);
+				break;
 			// case CallbackDataConstants.FindParkingQuery:
 			// 	await ProcessFindParkingAsync(update, user);
 			// 	break;
@@ -50,9 +54,7 @@ public class CallbackQueryProcessor
 			// 	await ProcessGeneratePaymentAsync(update, user);
 			// 	break;
 			//
-			// case CallbackDataConstants.BackToMainMenu:
-			// 	await ProcessBackToMainMenu(update, user);
-			// 	break;
+
 	
 			default:
 				break;
@@ -69,22 +71,16 @@ public class CallbackQueryProcessor
 		}
 	}
 
-	// private async Task ProcessBackToMainMenu(Update update, UserData user, string text = "Нажми кнопку и бот найдет парковочное место")
-	// {
-	// 	var ikm = new InlineKeyboardMarkup(new[]
-	// 	{
-	// 		new[]
-	// 		{
-	// 			InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
-	// 			InlineKeyboardButton.WithCallbackData($@"Осталось использований: {user.PayedUsages}",
-	// 				CallbackDataConstants.InfoAboutPayment)
-	// 		}
-	// 	});
-	//
-	// 	await _telegramBotClient.EditMessageTextAsync(update.CallbackQuery.From.Id,
-	// 		update.CallbackQuery.Message.MessageId, text, replyMarkup: ikm);
-	// }
-	//
+	private async Task ProcessBackToMainMenu(Update update, UserData user)
+	{
+		var states = _frameStateLogic.GetMainMenuStateForUser(update, user);
+		foreach (var currentState in states)
+		{
+			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
+				currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
+		}
+	}
+
 	// private async Task ProcessGeneratePaymentAsync(Update update, UserData user)
 	// {
 	// 	var paymentMessage = "В течении некоторого времени будет сформирована ссылка на оплату";
@@ -97,7 +93,7 @@ public class CallbackQueryProcessor
 	//
 	// 	await ProcessBackToMainMenu(update, user);
 	// }
-	//
+	
 	// private async Task ProcessFindParkingAsync(Update update,UserData user)
 	// {
 	// 	var tryAdd = _parkingRequestQueue.AddInQueue(update.CallbackQuery.From.Id);

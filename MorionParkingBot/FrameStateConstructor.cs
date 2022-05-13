@@ -100,4 +100,47 @@ public class FrameStateConstructor
 
 		return frameState;
 	}
+
+	public FrameState ConstructMainMenuStateForActiveLicense(long chatId, int messageId)
+	{
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
+				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}
+		});
+
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.StartMessage,
+			Ikm = ikm,
+			MessageId = messageId
+		};
+
+		return frameState;
+	}
+
+	public FrameState ConstructMainMenuStateForInactiveLicense(long chatId, int messageId)
+	{
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}
+		});
+
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.InactiveLicenseStartMessage,
+			Ikm = ikm,
+			MessageId = messageId
+		};
+
+		return frameState;
+	}
 }

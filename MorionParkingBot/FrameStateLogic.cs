@@ -45,4 +45,20 @@ public class FrameStateLogic
 			return new List<FrameState> {state};
 		}
 	}
+
+	public List<FrameState> GetMainMenuStateForUser(Update update, UserData user)
+	{
+		var isLicenseActive = user.LicenseInfo.ExpirationTime > DateTime.UtcNow;
+
+		if (isLicenseActive)
+		{
+			var state = _frameStateConstructor.ConstructMainMenuStateForActiveLicense(update.CallbackQuery.From.Id,
+				update.CallbackQuery.Message.MessageId);
+			return new List<FrameState> {state};
+		}
+
+		var states = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(update.CallbackQuery.From.Id,
+			update.CallbackQuery.Message.MessageId);
+		return new List<FrameState> {states};
+	}
 }

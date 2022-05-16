@@ -32,7 +32,7 @@ public class UsersService : IUsersService
 			};
 
 			await _usersRepository.AddNewLicenseAsync(newLicenseInfo);
-			createdUser.LicenseInfo = newLicenseInfo;
+			createdUser.LicenseInfos = new List<LicenseInfo> {newLicenseInfo};
 			await _usersRepository.UpdateUserAsync(createdUser);
 			user = createdUser;
 		}

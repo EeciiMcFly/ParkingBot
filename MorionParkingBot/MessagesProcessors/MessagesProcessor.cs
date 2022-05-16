@@ -39,6 +39,8 @@ public class MessagesProcessor
 		if (message.Text == "/start")
 		{
 			await ProcessStartMessageAsync(update, user);
+			
+			return;
 		}
 
 		await ProcessPromoCodeMessageAsync(update, user);

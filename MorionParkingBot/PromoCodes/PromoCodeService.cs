@@ -25,16 +25,16 @@ public class PromoCodeService : IPromoCodeService
 		if (promoCode.IsActivated)
 			return ActivationResult.AlreadyActivated;
 
-		var isLicenseActive = user.LicenseInfo.ExpirationTime > DateTime.UtcNow;
+		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
 		var licenseStartTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0,
 			DateTimeKind.Utc);
 		if (isLicenseActive)
-			licenseStartTime = user.LicenseInfo.ExpirationTime;
+			licenseStartTime = user.LicenseInfos.First().ExpirationTime;
 			
 		if (promoCode.PromoCodeType == PromoCodeType.ForMonth)
-			user.LicenseInfo.ExpirationTime = licenseStartTime.AddMonths(1);
+			user.LicenseInfos.First().ExpirationTime = licenseStartTime.AddMonths(1);
 		if (promoCode.PromoCodeType == PromoCodeType.ForYear)
-			user.LicenseInfo.ExpirationTime = licenseStartTime.AddYears(1);
+			user.LicenseInfos.First().ExpirationTime = licenseStartTime.AddYears(1);
 		promoCode.IsActivated = true;
 		await _usersService.UpdateUserAsync(user);
 		await _promoCodeRepository.UpdatePromoCodeAsync(promoCode);

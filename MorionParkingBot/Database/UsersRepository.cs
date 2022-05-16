@@ -13,7 +13,7 @@ public class UsersRepository : IUsersRepository
 
 	public async Task<UserData?> GetUserAsync(long telegramUserId)
 	{
-		var userData = await _userDbContext.Users.Include(x => x.LicenseInfo).FirstOrDefaultAsync(data => data.TelegramUserId == telegramUserId);
+		var userData = await _userDbContext.Users.Include(x => x.LicenseInfos).FirstOrDefaultAsync(data => data.TelegramUserId == telegramUserId);
 
 		return userData;
 	}

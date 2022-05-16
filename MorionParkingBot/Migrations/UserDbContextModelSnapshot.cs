@@ -40,8 +40,7 @@ namespace MorionParkingBot.Migrations
 
                     b.HasIndex("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("LicenseInfos");
                 });
@@ -67,8 +66,8 @@ namespace MorionParkingBot.Migrations
             modelBuilder.Entity("MorionParkingBot.Database.LicenseInfo", b =>
                 {
                     b.HasOne("MorionParkingBot.Database.UserData", "User")
-                        .WithOne("LicenseInfo")
-                        .HasForeignKey("MorionParkingBot.Database.LicenseInfo", "UserId")
+                        .WithMany("LicenseInfos")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -77,8 +76,7 @@ namespace MorionParkingBot.Migrations
 
             modelBuilder.Entity("MorionParkingBot.Database.UserData", b =>
                 {
-                    b.Navigation("LicenseInfo")
-                        .IsRequired();
+                    b.Navigation("LicenseInfos");
                 });
 #pragma warning restore 612, 618
         }

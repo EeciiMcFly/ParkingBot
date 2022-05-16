@@ -51,8 +51,7 @@ namespace MorionParkingBot.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_LicenseInfos_UserId",
                 table: "LicenseInfos",
-                column: "UserId",
-                unique: true);
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_TelegramUserId",

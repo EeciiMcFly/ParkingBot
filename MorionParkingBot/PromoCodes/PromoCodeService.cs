@@ -14,8 +14,9 @@ public class PromoCodeService : IPromoCodeService
 		_usersService = usersService;
 	}
 
-	public async Task<ActivationResult> ActivatePromoCodeAsync(UserData user, string codeString)
+	public async Task<ActivationResult> ActivatePromoCodeAsync(string codeString, BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
 		var promoCode = await _promoCodeRepository.GetPromoCodeAsync(codeString);
 
 		if (promoCode == null)

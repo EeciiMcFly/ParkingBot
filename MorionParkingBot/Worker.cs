@@ -23,17 +23,31 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
+				var botContext = new BotContext
+				{
+					ChatId = update.Message.Chat.Id,
+					TelegramUserId = update.Message.From.Id
+				};
+
 				using var scope = _serviceProvider.CreateAsyncScope();
 				var messagesProcessor = scope.ServiceProvider.GetService(typeof(MessagesProcessor)) as MessagesProcessor;
-				await messagesProcessor.ProcessMessage(update);
+				await messagesProcessor.ProcessMessage(update.Message.Text, botContext);
 				return;
 			}
 
 			if (update.Type == UpdateType.CallbackQuery)
 			{
+				var botContext = new BotContext
+				{
+					ChatId = update.CallbackQuery.From.Id,
+					TelegramUserId = update.CallbackQuery.From.Id,
+					MessageId = update.CallbackQuery.Message.MessageId,
+					CallbackData = update.CallbackQuery.Data
+				};
+				
 				using var scope = _serviceProvider.CreateAsyncScope();
 				var callbackQueryProcessor = scope.ServiceProvider.GetService(typeof(CallbackQueryProcessor)) as CallbackQueryProcessor;
-				await callbackQueryProcessor.ProcessCallbackQuery(update);
+				await callbackQueryProcessor.ProcessCallbackQuery(botContext);
 			}
 		}
 		catch (Exception e)

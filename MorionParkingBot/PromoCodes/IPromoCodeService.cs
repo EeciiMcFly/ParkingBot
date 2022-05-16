@@ -4,5 +4,5 @@ namespace MorionParkingBot.PromoCodes;
 
 public interface IPromoCodeService
 {
-	Task<ActivationResult> ActivatePromoCodeAsync(UserData user, string codeString);
+	Task<ActivationResult> ActivatePromoCodeAsync(string codeString, BotContext botContext);
 }

@@ -6,75 +6,87 @@ namespace MorionParkingBot.Frames;
 public class FrameStateLogic
 {
 	private readonly FrameStateConstructor _frameStateConstructor;
+	private readonly IUsersService _usersService;
 
-	public FrameStateLogic(FrameStateConstructor frameStateConstructor)
+	public FrameStateLogic(FrameStateConstructor frameStateConstructor, 
+		IUsersService usersService)
 	{
 		_frameStateConstructor = frameStateConstructor;
+		_usersService = usersService;
 	}
 
-	public List<FrameState> GetStartStateForUser(Update update, UserData user)
+	public async Task<List<FrameState>> GetStartStateForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
 		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
 
 		if (isLicenseActive)
 		{
-			var state = _frameStateConstructor.ConstructStartFrameForActiveLicense(update.Message.Chat.Id);
+			var state = _frameStateConstructor.ConstructStartFrameForActiveLicense(botContext.ChatId);
 			return new List<FrameState> {state};
 		}
 
-		var states = _frameStateConstructor.ConstructStartFrameForInactiveLicense(update.Message.Chat.Id);
+		var states = _frameStateConstructor.ConstructStartFrameForInactiveLicense(botContext.ChatId);
 		return states;
 	}
 
-	public List<FrameState> GetActivateCodeStateForUser(Update update, UserData user)
+	public async Task<List<FrameState>> GetActivateCodeStateForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
 		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
 		if (isLicenseActive)
 		{
 			var countOfLicenseDay = (user.LicenseInfos.First().ExpirationTime - DateTime.UtcNow).Days + 1;
-			var state = _frameStateConstructor.ConstructActivateCodeFrameForActiveLicense(update.CallbackQuery.From.Id,
-				update.CallbackQuery.Message.MessageId, countOfLicenseDay);
+			var state = _frameStateConstructor.ConstructActivateCodeFrameForActiveLicense(botContext.ChatId,
+				botContext.MessageId, countOfLicenseDay);
 			return new List<FrameState> {state};
 		}
 		else
 		{
 			var state =
-				_frameStateConstructor.ConstructActivateCodeFrameForInactiveLicense(update.CallbackQuery.From.Id,
-					update.CallbackQuery.Message.MessageId);
+				_frameStateConstructor.ConstructActivateCodeFrameForInactiveLicense(botContext.ChatId,
+					botContext.MessageId);
 
 			return new List<FrameState> {state};
 		}
 	}
 
-	public List<FrameState> GetMainMenuStateForUser(Update update, UserData user)
+	public async Task<List<FrameState>> GetMainMenuStateForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
 		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
 
 		if (isLicenseActive)
 		{
-			var state = _frameStateConstructor.ConstructMainMenuStateForActiveLicense(update.CallbackQuery.From.Id,
-				update.CallbackQuery.Message.MessageId);
+			var state = _frameStateConstructor.ConstructMainMenuStateForActiveLicense(botContext.ChatId,
+				botContext.MessageId);
 			return new List<FrameState> {state};
 		}
 
-		var states = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(update.CallbackQuery.From.Id,
-			update.CallbackQuery.Message.MessageId);
+		var states = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(botContext.ChatId,
+			botContext.MessageId);
 		return new List<FrameState> {states};
 	}
 
-	public List<FrameState> GetPromoCodeNotExistStateForUser(Update update, UserData user)
+	public List<FrameState> GetPromoCodeNotExistStateForUser(BotContext botContext)
 	{
-		var state = _frameStateConstructor.ConstructPromoCodeNotExistFrame(update.Message.Chat.Id);
+		var state = _frameStateConstructor.ConstructPromoCodeNotExistFrame(botContext.ChatId);
 		return new List<FrameState> {state};
 	}
 
-	public List<FrameState> GetPromoCodeAlreadyActivatedStateForUser(Update update, UserData user)
+	public List<FrameState> GetPromoCodeAlreadyActivatedStateForUser(BotContext botContext)
 	{
-		var state = _frameStateConstructor.ConstructPromoCodeAlreadyActivatedFrame(update.Message.Chat.Id);
+		var state = _frameStateConstructor.ConstructPromoCodeAlreadyActivatedFrame(botContext.ChatId);
 		return new List<FrameState> {state};
 	}
 
-	public List<FrameState> GetPromoCodeActivatedStateForUser(Update update, UserData user)
+	public List<FrameState> GetPromoCodeActivatedStateForUser(BotContext botContext)
+	{
+		var state = _frameStateConstructor.ConstructPromoCodeActivatedFrame(botContext.ChatId);
+		return state;
+	}
+
+	public List<FrameState> GetFingParkingStateForUser(Update update, UserData userData)
 	{
 		var state = _frameStateConstructor.ConstructPromoCodeActivatedFrame(update.Message.Chat.Id);
 		return state;

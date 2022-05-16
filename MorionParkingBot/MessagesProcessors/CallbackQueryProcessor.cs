@@ -1,40 +1,37 @@
 ﻿using MorionParkingBot.Constants;
 using MorionParkingBot.Frames;
-using MorionParkingBot.Users;
 using Telegram.Bot;
-using Telegram.Bot.Types;
 
 namespace MorionParkingBot.MessagesProcessors;
 
 public class CallbackQueryProcessor
 {
 	private readonly TelegramBotClient _telegramBotClient;
-	private readonly IUsersService _usersService;
-	private readonly ChatId _myChatId = new("340612851");
+	//private readonly ChatId _myChatId = new("340612851");
 	
 	private readonly FrameStateLogic _frameStateLogic;
 
-	public CallbackQueryProcessor(TelegramBotClient telegramBotClient, 
-		IUsersService usersService,
+	public CallbackQueryProcessor(TelegramBotClient telegramBotClient,
 		FrameStateLogic frameStateLogic)
 	{
 		_telegramBotClient = telegramBotClient;
-		_usersService = usersService;
 		_frameStateLogic = frameStateLogic;
 	}
 	
-	public async Task ProcessCallbackQuery(Update update)
+	public async Task ProcessCallbackQuery(BotContext botContext)
 	{
-		var user = await _usersService.GetOrCreateUserAsync(update.CallbackQuery.From.Id);
-
-		switch (update.CallbackQuery.Data)
+		switch (botContext.CallbackData)
 		{
 			case CallbackDataConstants.ActivateCode:
-				await ProcessActivateCode(update, user);
+				await ProcessActivateCode(botContext);
 				break;
 			
 			case CallbackDataConstants.BackToMainMenu:
-				await ProcessBackToMainMenu(update, user);
+				await ProcessBackToMainMenu(botContext);
+				break;
+			
+			case CallbackDataConstants.FindParkingQuery:
+				await ProcessFindParking(botContext);
 				break;
 			// case CallbackDataConstants.FindParkingQuery:
 			// 	await ProcessFindParkingAsync(update, user);
@@ -56,9 +53,9 @@ public class CallbackQueryProcessor
 		}
 	}
 
-	private async Task ProcessActivateCode(Update update, UserData user)
+	private async Task ProcessActivateCode(BotContext botContext)
 	{
-		var states = _frameStateLogic.GetActivateCodeStateForUser(update, user);
+		var states = await _frameStateLogic.GetActivateCodeStateForUser(botContext);
 		foreach (var currentState in states)
 		{
 			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
@@ -66,14 +63,24 @@ public class CallbackQueryProcessor
 		}
 	}
 
-	private async Task ProcessBackToMainMenu(Update update, UserData user)
+	private async Task ProcessBackToMainMenu(BotContext botContext)
 	{
-		var states = _frameStateLogic.GetMainMenuStateForUser(update, user);
+		var states = await _frameStateLogic.GetMainMenuStateForUser(botContext);
 		foreach (var currentState in states)
 		{
 			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
 				currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
 		}
+	}
+	
+	private async Task ProcessFindParking(BotContext botContext)
+	{
+		// var states = _frameStateLogic.GetMainMenuStateForUser(botContext);
+		// foreach (var currentState in states)
+		// {
+		// 	await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
+		// 		currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
+		// }
 	}
 
 	// private async Task ProcessGeneratePaymentAsync(Update update, UserData user)

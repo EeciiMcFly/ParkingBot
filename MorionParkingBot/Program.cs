@@ -10,6 +10,7 @@ builder.UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBui
 	containerBuilder.RegisterModule<PromoCodesModule>();
 	containerBuilder.RegisterModule<FramesModules>();
 	containerBuilder.RegisterModule<MessageProcessorsModules>();
+	containerBuilder.RegisterModule<ParkingsModule>();
 }));
 
 IHost host = builder

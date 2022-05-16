@@ -9,7 +9,7 @@ public class FramesModules : Module
 	{
 		builder.RegisterType<FrameStateLogic>()
 			.As<FrameStateLogic>()
-			.SingleInstance();
+			.InstancePerLifetimeScope();
 
 		builder.RegisterType<FrameStateConstructor>()
 			.As<FrameStateConstructor>()

@@ -1,6 +1,6 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 
-namespace MorionParkingBot;
+namespace MorionParkingBot.Frames;
 
 public class FrameState
 {

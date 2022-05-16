@@ -1,4 +1,4 @@
-﻿namespace MorionParkingBot;
+﻿namespace MorionParkingBot.Constants;
 
 public static class MessageConstants
 {

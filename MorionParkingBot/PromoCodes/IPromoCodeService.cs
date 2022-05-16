@@ -1,5 +1,4 @@
-﻿
-using MorionParkingBot.Database;
+﻿using MorionParkingBot.Users;
 
 namespace MorionParkingBot.PromoCodes;
 

@@ -1,6 +1,4 @@
-﻿using MorionParkingBot.Database;
-
-namespace MorionParkingBot.Users;
+﻿namespace MorionParkingBot.Users;
 
 public class UsersService : IUsersService
 {

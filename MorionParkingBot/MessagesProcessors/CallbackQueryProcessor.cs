@@ -1,4 +1,5 @@
-﻿using MorionParkingBot.Database;
+﻿using MorionParkingBot.Constants;
+using MorionParkingBot.Frames;
 using MorionParkingBot.Users;
 using Telegram.Bot;
 using Telegram.Bot.Types;
@@ -9,19 +10,16 @@ public class CallbackQueryProcessor
 {
 	private readonly TelegramBotClient _telegramBotClient;
 	private readonly IUsersService _usersService;
-	private readonly ParkingRequestQueue _parkingRequestQueue;
 	private readonly ChatId _myChatId = new("340612851");
 	
 	private readonly FrameStateLogic _frameStateLogic;
 
 	public CallbackQueryProcessor(TelegramBotClient telegramBotClient, 
 		IUsersService usersService,
-		ParkingRequestQueue parkingRequestQueue,
 		FrameStateLogic frameStateLogic)
 	{
 		_telegramBotClient = telegramBotClient;
 		_usersService = usersService;
-		_parkingRequestQueue = parkingRequestQueue;
 		_frameStateLogic = frameStateLogic;
 	}
 	

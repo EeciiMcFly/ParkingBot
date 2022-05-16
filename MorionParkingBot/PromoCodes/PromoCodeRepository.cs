@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace MorionParkingBot.Database;
+namespace MorionParkingBot.PromoCodes;
 
 public class PromoCodeRepository : IPromoCodeRepository
 {

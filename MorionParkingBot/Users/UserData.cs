@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace MorionParkingBot.Database;
+namespace MorionParkingBot.Users;
 
 [Index(nameof(TelegramUserId))]
 public class UserData

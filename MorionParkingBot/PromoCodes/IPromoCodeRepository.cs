@@ -1,4 +1,4 @@
-﻿namespace MorionParkingBot.Database;
+﻿namespace MorionParkingBot.PromoCodes;
 
 public interface IPromoCodeRepository
 {

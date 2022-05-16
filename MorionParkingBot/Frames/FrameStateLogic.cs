@@ -1,7 +1,7 @@
-﻿using MorionParkingBot.Database;
+﻿using MorionParkingBot.Users;
 using Telegram.Bot.Types;
 
-namespace MorionParkingBot;
+namespace MorionParkingBot.Frames;
 
 public class FrameStateLogic
 {

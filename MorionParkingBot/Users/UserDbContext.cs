@@ -1,21 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace MorionParkingBot.Database;
+namespace MorionParkingBot.Users;
 
-public class PromoCodeDbContext : DbContext
+public class UserDbContext : DbContext
 {
-	public PromoCodeDbContext()
+	public UserDbContext()
 	{
-		
 	}
 
-	public PromoCodeDbContext(DbContextOptions<PromoCodeDbContext> options) : base(options)
+	public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
 	{
 		Database.Migrate();
 	}
+
+	public DbSet<UserData> Users { get; set; }
 	
-	public DbSet<PromoCodeData> PromoCodes { get; set; }
-	
+	public DbSet<LicenseInfo> LicenseInfos { get; set; }
+
 	// Метод переопределяется для создания миграций
 	// При работе сервиса контекст определяется в autofac и IsConfigured будет true
 	protected override void OnConfiguring(DbContextOptionsBuilder options)

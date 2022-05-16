@@ -17,4 +17,6 @@ public static class MessageConstants
 	public const string PromoCodeAlreadyActivated = "Промокод уже активирован. Попробуйте другой.";
 
 	public const string PromoCodeActivated = "Промокод успешно активирован. Ваша лицензия обновлена.";
+
+	public const string ChooseParking = "Выберите парковку на которой хотите найти место";
 }

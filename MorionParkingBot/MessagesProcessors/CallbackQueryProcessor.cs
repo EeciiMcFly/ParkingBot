@@ -75,12 +75,12 @@ public class CallbackQueryProcessor
 	
 	private async Task ProcessFindParking(BotContext botContext)
 	{
-		// var states = _frameStateLogic.GetMainMenuStateForUser(botContext);
-		// foreach (var currentState in states)
-		// {
-		// 	await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
-		// 		currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
-		// }
+		var states = await _frameStateLogic.GetFingParkingStateForUser(botContext);
+		foreach (var currentState in states)
+		{
+			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
+				currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
+		}
 	}
 
 	// private async Task ProcessGeneratePaymentAsync(Update update, UserData user)

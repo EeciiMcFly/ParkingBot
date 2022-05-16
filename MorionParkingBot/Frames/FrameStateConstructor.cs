@@ -1,4 +1,5 @@
 ﻿using MorionParkingBot.Constants;
+using MorionParkingBot.Parkings;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MorionParkingBot.Frames;
@@ -216,5 +217,33 @@ public class FrameStateConstructor
 		};
 
 		return frameStateList;
+	}
+
+	public FrameState ConstructSingleFindParkingFrame(long chatId, int messageId, List<ParkingData> parkingDatas)
+	{
+		var buttonsArray = new InlineKeyboardButton[parkingDatas.Count + 1];
+		for (int i = 0; i < parkingDatas.Count; i++)
+		{
+			var parkingIdQueryData = $"parkingId:{parkingDatas[i].Id}";
+			buttonsArray[i] = InlineKeyboardButton.WithCallbackData($"{parkingDatas[i].Name}", parkingIdQueryData);
+		}
+
+		buttonsArray[parkingDatas.Count] =
+			InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu);
+
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			buttonsArray
+		});
+
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.ChooseParking,
+			MessageId = messageId,
+			Ikm = ikm
+		};
+
+		return frameState;
 	}
 }

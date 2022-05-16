@@ -1,5 +1,5 @@
-﻿using MorionParkingBot.Users;
-using Telegram.Bot.Types;
+﻿using MorionParkingBot.Parkings;
+using MorionParkingBot.Users;
 
 namespace MorionParkingBot.Frames;
 
@@ -7,12 +7,15 @@ public class FrameStateLogic
 {
 	private readonly FrameStateConstructor _frameStateConstructor;
 	private readonly IUsersService _usersService;
+	private readonly IParkingsService _parkingsService;
 
 	public FrameStateLogic(FrameStateConstructor frameStateConstructor, 
-		IUsersService usersService)
+		IUsersService usersService, 
+		IParkingsService parkingsService)
 	{
 		_frameStateConstructor = frameStateConstructor;
 		_usersService = usersService;
+		_parkingsService = parkingsService;
 	}
 
 	public async Task<List<FrameState>> GetStartStateForUser(BotContext botContext)
@@ -86,9 +89,22 @@ public class FrameStateLogic
 		return state;
 	}
 
-	public List<FrameState> GetFingParkingStateForUser(Update update, UserData userData)
+	public async Task<List<FrameState>> GetFingParkingStateForUser(BotContext botContext)
 	{
-		var state = _frameStateConstructor.ConstructPromoCodeActivatedFrame(update.Message.Chat.Id);
-		return state;
+		var parkings = await _parkingsService.GetParkingForIkmAsync();
+		var isBigCount = parkings.Count > 4;
+
+		var states = new List<FrameState>();
+		if (isBigCount)
+		{
+			
+		}
+		else
+		{
+			var state = _frameStateConstructor.ConstructSingleFindParkingFrame(botContext.ChatId, botContext.MessageId, parkings);
+			states.Add(state);
+		}
+		
+		return states;
 	}
 }

@@ -107,4 +107,21 @@ public class FrameStateLogic
 		
 		return states;
 	}
+
+	public async Task<List<FrameState>> GetParkingStateForUser(BotContext botContext)
+	{
+		var parkingId = Convert.ToInt64(botContext.CallbackData.Split(":")[1]);
+		var parkingResult = await _parkingsService.FindParkingAsync(parkingId);
+
+		if (!parkingResult.IsFreeParkingFind)
+		{
+			var states = _frameStateConstructor.ConstructNoParkingFrame(botContext.ChatId, parkingResult.ParkingName);
+			return states;
+		}
+		else
+		{
+			var states = _frameStateConstructor.ConstructFoundParkingFrame(botContext.ChatId, parkingResult.Image);
+			return states;
+		}
+	}
 }

@@ -18,11 +18,19 @@ public class ParkingsRepository : IParkingsRepository
 		return parkings;
 	}
 
-	public async Task<ParkingData> GetParkingByNameAsync(string parkingName)
+	public async Task<ParkingData> GetParkingById(long parkingId)
 	{
 		var parking = await _parkingDbContext.Parkings.Include(x => x.Cameras)
-			.FirstOrDefaultAsync(parling => parling.Name.Equals(parkingName));
+			.FirstOrDefaultAsync(parling => parling.Id.Equals(parkingId));
 
 		return parking;
+	}
+
+	public async Task<List<CameraData>> GetCameraRangeById(List<long> cameraIds)
+	{
+		var cameras = await _parkingDbContext.Cameras.Include(x => x.Server)
+			.Where(x => cameraIds.Contains(x.Id)).ToListAsync();
+
+		return cameras;
 	}
 }

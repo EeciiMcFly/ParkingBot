@@ -1,5 +1,6 @@
 ﻿using MorionParkingBot.Constants;
 using MorionParkingBot.Parkings;
+using SixLabors.ImageSharp;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MorionParkingBot.Frames;
@@ -245,5 +246,89 @@ public class FrameStateConstructor
 		};
 
 		return frameState;
+	}
+	
+	// public FrameState ConstructPluralFindParkingFrame(long chatId, int messageId, List<ParkingData> parkingDatas)
+	// {
+	// 	var buttonsArray = new InlineKeyboardButton[parkingDatas.Count + 1];
+	// 	for (int i = 0; i < parkingDatas.Count; i++)
+	// 	{
+	// 		var parkingIdQueryData = $"parkingId:{parkingDatas[i].Id}";
+	// 		buttonsArray[i] = InlineKeyboardButton.WithCallbackData($"{parkingDatas[i].Name}", parkingIdQueryData);
+	// 	}
+	//
+	// 	buttonsArray[parkingDatas.Count] =
+	// 		InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu);
+	//
+	// 	var ikm = new InlineKeyboardMarkup(new[]
+	// 	{
+	// 		buttonsArray
+	// 	});
+	//
+	// 	var frameState = new FrameState
+	// 	{
+	// 		ChatId = chatId,
+	// 		MessageText = MessageConstants.ChooseParking,
+	// 		MessageId = messageId,
+	// 		Ikm = ikm
+	// 	};
+	//
+	// 	return frameState;
+	// }
+	
+	public List<FrameState> ConstructNoParkingFrame(long chatId, string parkingName)
+	{
+		var messageText = string.Format(MessageConstants.NoParking, parkingName);
+		var firstFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = messageText,
+		};
+
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
+				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}
+		});
+
+		var secondFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.StartMessage,
+			Ikm = ikm
+		};
+
+		return new List<FrameState> {firstFrameState, secondFrameState};
+	}
+
+	public List<FrameState> ConstructFoundParkingFrame(long chatId, Image image)
+	{
+		var firstFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.ParkingFound,
+			Image = image
+		};
+		
+		var ikm = new InlineKeyboardMarkup(new[]
+		{
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
+				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}
+		});
+
+		var secondFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.StartMessage,
+			Ikm = ikm
+		};
+
+		return new List<FrameState> {firstFrameState, secondFrameState};
 	}
 }

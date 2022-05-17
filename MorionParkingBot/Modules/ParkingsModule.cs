@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using Microsoft.EntityFrameworkCore;
 using MorionParkingBot.Parkings;
+using MorionParkingBot.Parkings.ToServerServices;
 
 namespace MorionParkingBot.Modules;
 
@@ -25,5 +26,9 @@ public class ParkingsModule : Module
 		builder.RegisterType<ParkingsService>()
 			.As<IParkingsService>()
 			.InstancePerLifetimeScope();
+
+		builder.RegisterType<ServerInfoProvider>()
+			.As<ServerInfoProvider>()
+			.SingleInstance();
 	}
 }

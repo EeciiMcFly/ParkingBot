@@ -4,5 +4,7 @@ public interface IParkingsRepository
 {
 	Task<List<ParkingData>> GetAllParkingsAsync();
 
-	Task<ParkingData> GetParkingByNameAsync(string parkingName);
+	Task<ParkingData> GetParkingById(long parkingId);
+
+	Task<List<CameraData>> GetCameraRangeById(List<long> cameraIds);
 }

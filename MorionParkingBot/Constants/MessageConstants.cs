@@ -19,4 +19,8 @@ public static class MessageConstants
 	public const string PromoCodeActivated = "Промокод успешно активирован. Ваша лицензия обновлена.";
 
 	public const string ChooseParking = "Выберите парковку на которой хотите найти место";
+
+	public const string NoParking = "На парковке {0} свободное место не найдено";
+
+	public const string ParkingFound = "Нашел парковочное место. Вот фото:";
 }

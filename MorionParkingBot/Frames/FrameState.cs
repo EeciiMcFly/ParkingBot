@@ -1,4 +1,5 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using SixLabors.ImageSharp;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace MorionParkingBot.Frames;
 
@@ -11,4 +12,6 @@ public class FrameState
 	public string MessageText { get; set; }
 	
 	public InlineKeyboardMarkup Ikm { get; set; }
+	
+	public Image Image { get; set; }
 }

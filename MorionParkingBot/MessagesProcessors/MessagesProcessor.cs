@@ -22,16 +22,16 @@ public class MessagesProcessor
 		_promoCodeService = promoCodeService;
 	}
 
-	public async Task ProcessMessage(string messageText, BotContext botContext)
+	public async Task ProcessMessage(BotContext botContext)
 	{
-		if (messageText == "/start")
+		if (botContext.MessageText == "/start")
 		{
 			await ProcessStartMessageAsync(botContext);
 			
 			return;
 		}
 
-		await ProcessPromoCodeMessageAsync(messageText, botContext);
+		await ProcessPromoCodeMessageAsync(botContext);
 	}
 
 	private async Task ProcessStartMessageAsync(BotContext botContext)
@@ -47,9 +47,9 @@ public class MessagesProcessor
 		}
 	}
 
-	private async Task ProcessPromoCodeMessageAsync(string codeString, BotContext botContext)
+	private async Task ProcessPromoCodeMessageAsync(BotContext botContext)
 	{
-		var activationResult = await _promoCodeService.ActivatePromoCodeAsync(codeString, botContext);
+		var activationResult = await _promoCodeService.ActivatePromoCodeAsync(botContext.MessageText, botContext);
 
 		var states = new List<FrameState>();
 		switch (activationResult)

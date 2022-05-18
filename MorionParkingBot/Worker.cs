@@ -26,12 +26,13 @@ public class Worker : IHostedService
 				var botContext = new BotContext
 				{
 					ChatId = update.Message.Chat.Id,
-					TelegramUserId = update.Message.From.Id
+					TelegramUserId = update.Message.From.Id,
+					MessageText = update.Message.Text
 				};
 
 				using var scope = _serviceProvider.CreateAsyncScope();
 				var messagesProcessor = scope.ServiceProvider.GetService(typeof(MessagesProcessor)) as MessagesProcessor;
-				await messagesProcessor.ProcessMessage(update.Message.Text, botContext);
+				await messagesProcessor.ProcessMessage(botContext);
 				return;
 			}
 

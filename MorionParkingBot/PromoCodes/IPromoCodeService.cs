@@ -1,6 +1,4 @@
-﻿using MorionParkingBot.Users;
-
-namespace MorionParkingBot.PromoCodes;
+﻿namespace MorionParkingBot.PromoCodes;
 
 public interface IPromoCodeService
 {

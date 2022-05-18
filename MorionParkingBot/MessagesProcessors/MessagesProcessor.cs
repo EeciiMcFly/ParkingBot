@@ -1,6 +1,7 @@
 ﻿using MorionParkingBot.Frames;
 using MorionParkingBot.PromoCodes;
 using Telegram.Bot;
+using ILogger = Serilog.ILogger;
 
 namespace MorionParkingBot.MessagesProcessors;
 
@@ -12,14 +13,17 @@ public class MessagesProcessor
 
 	private readonly FrameStateLogic _frameStateLogic;
 	private readonly IPromoCodeService _promoCodeService;
+	private readonly ILogger _logger;
 
 	public MessagesProcessor(TelegramBotClient telegramBotClient,
 		FrameStateLogic frameStateLogic, 
-		IPromoCodeService promoCodeService)
+		IPromoCodeService promoCodeService, 
+		ILogger logger)
 	{
 		_telegramBotClient = telegramBotClient;
 		_frameStateLogic = frameStateLogic;
 		_promoCodeService = promoCodeService;
+		_logger = logger;
 	}
 
 	public async Task ProcessMessage(BotContext botContext)
@@ -36,6 +40,7 @@ public class MessagesProcessor
 
 	private async Task ProcessStartMessageAsync(BotContext botContext)
 	{
+		_logger.Information($"Process start command for user - {botContext.TelegramUserId}");
 		var states = await _frameStateLogic.GetStartStateForUser(botContext);
 		foreach (var currentState in states)
 		{
@@ -49,6 +54,7 @@ public class MessagesProcessor
 
 	private async Task ProcessPromoCodeMessageAsync(BotContext botContext)
 	{
+		_logger.Information($"Process promocode data for user - {botContext.TelegramUserId}");
 		var activationResult = await _promoCodeService.ActivatePromoCodeAsync(botContext.MessageText, botContext);
 
 		var states = new List<FrameState>();

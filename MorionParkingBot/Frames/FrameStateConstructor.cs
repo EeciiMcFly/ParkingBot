@@ -232,10 +232,17 @@ public class FrameStateConstructor
 		buttonsArray[parkingDatas.Count] =
 			InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu);
 
-		var ikm = new InlineKeyboardMarkup(new[]
+		var finalList = new List<List<InlineKeyboardButton>>();
+		for (int i = 0; i < buttonsArray.Length; i++)
 		{
-			buttonsArray
-		});
+			if (i % 3 == 0)
+			{
+				finalList.Add(new List<InlineKeyboardButton>());
+			}
+			finalList.Last().Add(buttonsArray[i]);
+		}
+
+		var ikm = new InlineKeyboardMarkup(finalList);
 
 		var frameState = new FrameState
 		{
@@ -248,34 +255,96 @@ public class FrameStateConstructor
 		return frameState;
 	}
 	
-	// public FrameState ConstructPluralFindParkingFrame(long chatId, int messageId, List<ParkingData> parkingDatas)
-	// {
-	// 	var buttonsArray = new InlineKeyboardButton[parkingDatas.Count + 1];
-	// 	for (int i = 0; i < parkingDatas.Count; i++)
-	// 	{
-	// 		var parkingIdQueryData = $"parkingId:{parkingDatas[i].Id}";
-	// 		buttonsArray[i] = InlineKeyboardButton.WithCallbackData($"{parkingDatas[i].Name}", parkingIdQueryData);
-	// 	}
-	//
-	// 	buttonsArray[parkingDatas.Count] =
-	// 		InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.BackToMainMenu);
-	//
-	// 	var ikm = new InlineKeyboardMarkup(new[]
-	// 	{
-	// 		buttonsArray
-	// 	});
-	//
-	// 	var frameState = new FrameState
-	// 	{
-	// 		ChatId = chatId,
-	// 		MessageText = MessageConstants.ChooseParking,
-	// 		MessageId = messageId,
-	// 		Ikm = ikm
-	// 	};
-	//
-	// 	return frameState;
-	// }
+	public FrameState ConstructPluralFindParkingFrame(long chatId, int messageId, List<ParkingData> parkingDatas)
+	{
+		var buttonsArray = new InlineKeyboardButton[6];
+		for (int i = 0; i < 4; i++)
+		{
+			var parkingIdQueryData = $"parkingId:{parkingDatas[i].Id}";
+			buttonsArray[i] = InlineKeyboardButton.WithCallbackData($"{parkingDatas[i].Name}", parkingIdQueryData);
+		}
 	
+		buttonsArray[4] =
+			InlineKeyboardButton.WithCallbackData("В меню", CallbackDataConstants.BackToMainMenu);
+		var nextPortionQuery = $"next:{2}";
+		buttonsArray[5] =
+			InlineKeyboardButton.WithCallbackData("Далее", nextPortionQuery);
+	
+		var finalList = new List<List<InlineKeyboardButton>>();
+		for (int i = 0; i < buttonsArray.Length; i++)
+		{
+			if (i % 3 == 0)
+			{
+				finalList.Add(new List<InlineKeyboardButton>());
+			}
+			finalList.Last().Add(buttonsArray[i]);
+		}
+		
+		var ikm = new InlineKeyboardMarkup(finalList);
+	
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.ChooseParking,
+			MessageId = messageId,
+			Ikm = ikm
+		};
+	
+		return frameState;
+	}
+
+	public FrameState ConstructNextPortionFrame(long chatId, int messageId, int portionNumber,
+		List<ParkingData> parkingDatas)
+	{
+		var count = 0;
+		var isExistNextPortion = parkingDatas.Count - 4 * (portionNumber)  > 0;
+		var portionSize = Math.Min(4, parkingDatas.Count - 4 * (portionNumber - 1));
+		var fullSize = portionSize;
+		if (isExistNextPortion)
+			fullSize += 2;
+		else
+			fullSize += 1;
+
+		var buttonsArray = new InlineKeyboardButton[fullSize];
+		for (int i = (portionNumber - 1) * 4; count != portionSize; i++)
+		{
+			var parkingIdQueryData = $"parkingId:{parkingDatas[i].Id}";
+			buttonsArray[count] = InlineKeyboardButton.WithCallbackData($"{parkingDatas[i].Name}", parkingIdQueryData);
+			count++;
+		}
+	
+		buttonsArray[count++] =
+			InlineKeyboardButton.WithCallbackData("В меню", CallbackDataConstants.BackToMainMenu);
+		if (isExistNextPortion)
+		{
+			var nextPortionQuery = $"next:{portionNumber + 1}";
+			buttonsArray[count] =
+				InlineKeyboardButton.WithCallbackData("Далее", nextPortionQuery);
+		}
+
+		var finalList = new List<List<InlineKeyboardButton>>();
+		for (int i = 0; i < buttonsArray.Length; i++)
+		{
+			if (i % 3 == 0)
+			{
+				finalList.Add(new List<InlineKeyboardButton>());
+			}
+			finalList.Last().Add(buttonsArray[i]);
+		}
+		
+		var ikm = new InlineKeyboardMarkup(finalList);
+	
+		var frameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = MessageConstants.ChooseParking,
+			MessageId = messageId,
+			Ikm = ikm
+		};
+	
+		return frameState;
+	}
+
 	public List<FrameState> ConstructNoParkingFrame(long chatId, string parkingName)
 	{
 		var messageText = string.Format(MessageConstants.NoParking, parkingName);

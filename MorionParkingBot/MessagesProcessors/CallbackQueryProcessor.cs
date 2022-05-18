@@ -39,6 +39,8 @@ public class CallbackQueryProcessor
 			default:
 				if (botContext.CallbackData.Contains("parkingId"))
 					await ProcessParkingId(botContext);
+				if (botContext.CallbackData.Contains("next"))
+					await ProcessNextParkings(botContext);
 				break;
 		}
 	}
@@ -73,6 +75,16 @@ public class CallbackQueryProcessor
 		}
 	}
 
+	private async Task ProcessNextParkings(BotContext botContext)
+	{
+		var states = await _frameStateLogic.GetNextParkingsForUser(botContext);
+		foreach (var currentState in states)
+		{
+			await _telegramBotClient.EditMessageTextAsync(currentState.ChatId,
+				currentState.MessageId, currentState.MessageText, replyMarkup: currentState.Ikm);
+		}
+	}
+
 	private async Task ProcessParkingId(BotContext botContext)
 	{
 		var states = await _frameStateLogic.GetParkingStateForUser(botContext);
@@ -88,6 +100,8 @@ public class CallbackQueryProcessor
 					ms.Position = 0;
 					await _telegramBotClient.SendPhotoAsync(currentState.ChatId, new InputOnlineFile(ms));
 				}
+				
+				continue;
 			}
 	
 			if (currentState.Ikm != null)

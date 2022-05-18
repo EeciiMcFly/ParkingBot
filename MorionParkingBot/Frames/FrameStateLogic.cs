@@ -97,7 +97,8 @@ public class FrameStateLogic
 		var states = new List<FrameState>();
 		if (isBigCount)
 		{
-			
+			var state = _frameStateConstructor.ConstructPluralFindParkingFrame(botContext.ChatId, botContext.MessageId, parkings);
+			states.Add(state);
 		}
 		else
 		{
@@ -105,6 +106,16 @@ public class FrameStateLogic
 			states.Add(state);
 		}
 		
+		return states;
+	}
+
+	public async Task<List<FrameState>> GetNextParkingsForUser(BotContext botContext)
+	{
+		var portionNumber = Convert.ToInt32(botContext.CallbackData.Split(":")[1]);
+		var parkings = await _parkingsService.GetParkingForIkmAsync();
+		var states = new List<FrameState>();
+		var state = _frameStateConstructor.ConstructNextPortionFrame(botContext.ChatId, botContext.MessageId, portionNumber, parkings);
+		states.Add(state);
 		return states;
 	}
 

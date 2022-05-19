@@ -1,60 +1,39 @@
-﻿using SixLabors.ImageSharp;
+﻿using System.Text.Json;
+using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 
 namespace MorionParkingBot.Parkings.ToServerServices;
 
 public class ServerInfoProvider
 {
-	public async Task<ServerParkingInfo> GetInfoAboutParkingFromServerAsync(CameraData camera)
+	public async Task<CountingChannelDTO> GetInfoAboutParkingFromServerAsync(CameraData camera)
 	{
-		var server = camera.Server;
-
-		var requestUrl = $"{server.ServerUrl}/api/parking/{camera.CameraId}";
-		var requestResult = false;
-
-		var pointLT = new Point
+		try
 		{
-			X = (float) 0.2755,
-			Y = (float) 0.4788
-		};
-		var pointRT = new Point
+			var server = camera.Server;
+			var requestUrl = $"{server.ServerUrl}/api/parking?login={server.Login}&password=";
+			var httpClient = new HttpClient();
+			var result = await httpClient.GetAsync(requestUrl);
+			var jsonString = await result.Content.ReadAsStringAsync();
+			var сountingChannelsDTO = JsonSerializer.Deserialize<CountingChannelsDTO>(jsonString);
+			var cameraFromServer = сountingChannelsDTO.CountingChannels.FirstOrDefault(x => x.Id == camera.CameraId);
+			return cameraFromServer;
+		}
+		catch (Exception e)
 		{
-			X = (float) 0.5232,
-			Y = (float) 0.7183
-		};
-		var pointRB = new Point
-		{
-			X = (float) 0.5108,
-			Y = (float) 0.4741
+			var emptyResult = new CountingChannelDTO
+			{
+				Zones = new List<ParkingZoneDTO>
+				{
+					new()
+					{
+						IsFree = false
+					}
+				}
+			};
 
-		};
-		var pointLB = new Point
-		{
-			X = (float) 0.2724,
-			Y = (float) 0.2730
-		};
-
-		var zone = new Zone
-		{
-			PointLT = pointLT,
-			PointRT = pointRT,
-			PointRB = pointRB,
-			PointLB = pointLB
-		};
-
-		var parkingInfo = new ParkingsInfo
-		{
-			Id = 1,
-			Points = zone,
-			IsFree = true
-		};
-
-		var serverParkingInfo = new ServerParkingInfo
-		{
-			Parkings = new List<ParkingsInfo> {parkingInfo}
-		};
-
-		return serverParkingInfo;
+			return emptyResult;
+		}
 	}
 
 	public async Task<Image> GetRealtimeFrameFromServer(CameraData camera)

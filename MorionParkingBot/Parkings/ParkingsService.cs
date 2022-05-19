@@ -29,11 +29,11 @@ public class ParkingsService : IParkingsService
 		var parkingData = await _parkingsRepository.GetParkingById(parkingId);
 		var cameraIds = parkingData.Cameras.Select(x => x.Id).ToList();
 		var cameras = await _parkingsRepository.GetCameraRangeById(cameraIds);
-		var parkingInfoMap = new Dictionary<long, List<ParkingsInfo>>();
+		var parkingInfoMap = new Dictionary<long, List<ParkingZoneDTO>>();
 		foreach (var camera in cameras)
 		{
 			var parkingInfo = await _serverInfoProvider.GetInfoAboutParkingFromServerAsync(camera);
-			var freeParkings = parkingInfo.Parkings.Where(x => x.IsFree).ToList();
+			var freeParkings = parkingInfo.Zones.Where(x => x.IsFree).ToList();
 			if (freeParkings.Count > 0)
 				parkingInfoMap[camera.Id] = freeParkings;
 		}

@@ -91,6 +91,15 @@ public class FrameStateLogic
 
 	public async Task<List<FrameState>> GetFingParkingStateForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
+		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
+		if (!isLicenseActive)
+		{
+			var startState = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(botContext.ChatId,
+				botContext.MessageId);
+			return new List<FrameState> {startState};
+		}
+
 		var parkings = await _parkingsService.GetParkingForIkmAsync();
 		var isBigCount = parkings.Count > 4;
 
@@ -111,6 +120,15 @@ public class FrameStateLogic
 
 	public async Task<List<FrameState>> GetNextParkingsForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
+		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
+		if (!isLicenseActive)
+		{
+			var startState = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(botContext.ChatId,
+				botContext.MessageId);
+			return new List<FrameState> {startState};
+		}
+
 		var portionNumber = Convert.ToInt32(botContext.CallbackData.Split(":")[1]);
 		var parkings = await _parkingsService.GetParkingForIkmAsync();
 		var states = new List<FrameState>();
@@ -121,6 +139,15 @@ public class FrameStateLogic
 
 	public async Task<List<FrameState>> GetParkingStateForUser(BotContext botContext)
 	{
+		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
+		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
+		if (!isLicenseActive)
+		{
+			var startState = _frameStateConstructor.ConstructMainMenuStateForInactiveLicense(botContext.ChatId,
+				botContext.MessageId);
+			return new List<FrameState> {startState};
+		}
+
 		var parkingId = Convert.ToInt64(botContext.CallbackData.Split(":")[1]);
 		var parkingResult = await _parkingsService.FindParkingAsync(parkingId);
 

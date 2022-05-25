@@ -49,26 +49,31 @@ public class ParkingsService : IParkingsService
 			return findParkingResult;
 		}
 
-		var parkingToProcess = parkingInfoMap.First();
-		var cameraToProcess = cameras.FirstOrDefault(x => x.Id == parkingToProcess.Key);
-		const double penWidthFactor = 0.002;
-		var realtimeImage = await _serverInfoProvider.GetRealtimeFrameFromServer(cameraToProcess);
-		foreach (var parkingsInfo in parkingToProcess.Value)
+		var images = new List<Image>();
+		foreach (var currentProcessParking in parkingInfoMap)
 		{
-			var pointLT = parkingsInfo.Points.PointLT.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
-			var pointRT = parkingsInfo.Points.PointRT.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
-			var pointRB = parkingsInfo.Points.PointRB.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
-			var pointLB = parkingsInfo.Points.PointLB.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
-			var penWidth = (int)(penWidthFactor * realtimeImage.Width);
-			var pen = new Pen(Color.Red, penWidth);
-			realtimeImage.Mutate(x => x.DrawLines(pen, pointLT, pointRT, pointRB, pointLB, pointLT));
+			var cameraToProcess = cameras.FirstOrDefault(x => x.Id == currentProcessParking.Key);
+			const double penWidthFactor = 0.002;
+			var realtimeImage = await _serverInfoProvider.GetRealtimeFrameFromServer(cameraToProcess);
+			foreach (var parkingsInfo in currentProcessParking.Value)
+			{
+				var pointLT = parkingsInfo.Points.PointLT.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
+				var pointRT = parkingsInfo.Points.PointRT.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
+				var pointRB = parkingsInfo.Points.PointRB.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
+				var pointLB = parkingsInfo.Points.PointLB.ToImagePointF(realtimeImage.Width, realtimeImage.Height);
+				var penWidth = (int)(penWidthFactor * realtimeImage.Width);
+				var pen = new Pen(Color.Red, penWidth);
+				realtimeImage.Mutate(x => x.DrawLines(pen, pointLT, pointRT, pointRB, pointLB, pointLT));
+			}
+			images.Add(realtimeImage);
 		}
+		
 
 		var foundedParkingResult = new FindParkingResult
 		{
 			ParkingName = parkingData.Name,
 			IsFreeParkingFind = true,
-			Image = realtimeImage
+			Images = images
 		};
 
 		return foundedParkingResult;

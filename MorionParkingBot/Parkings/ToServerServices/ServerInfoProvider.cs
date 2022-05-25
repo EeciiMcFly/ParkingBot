@@ -52,6 +52,7 @@ public class ServerInfoProvider
 			var imageDecoder = new JpegDecoder();
 			image = Image.Load(config, ms, imageDecoder);
 		}
+		stream.Close();
 
 		return image;
 	}

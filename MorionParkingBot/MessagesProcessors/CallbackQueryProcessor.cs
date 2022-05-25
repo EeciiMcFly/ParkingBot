@@ -90,15 +90,18 @@ public class CallbackQueryProcessor
 		var states = await _frameStateLogic.GetParkingStateForUser(botContext);
 		foreach (var currentState in states)
 		{
-			if (currentState.Image != null)
+			if (currentState.Images != null)
 			{
 				await _telegramBotClient.SendTextMessageAsync(currentState.ChatId, currentState.MessageText);
-				using (var ms = new MemoryStream())
+				foreach (var image in currentState.Images)
 				{
-					var imageEncoder = new JpegEncoder();
-					currentState.Image.Save(ms, imageEncoder);
-					ms.Position = 0;
-					await _telegramBotClient.SendPhotoAsync(currentState.ChatId, new InputOnlineFile(ms));
+					using (var ms = new MemoryStream())
+					{
+						var imageEncoder = new JpegEncoder();
+						image.Save(ms, imageEncoder);
+						ms.Position = 0;
+						await _telegramBotClient.SendPhotoAsync(currentState.ChatId, new InputOnlineFile(ms));
+					}
 				}
 				
 				continue;

@@ -158,7 +158,7 @@ public class FrameStateLogic
 		}
 		else
 		{
-			var states = _frameStateConstructor.ConstructFoundParkingFrame(botContext.ChatId, parkingResult.Image);
+			var states = _frameStateConstructor.ConstructFoundParkingFrame(botContext.ChatId, parkingResult.Images);
 			return states;
 		}
 	}

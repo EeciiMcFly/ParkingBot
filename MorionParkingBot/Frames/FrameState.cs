@@ -13,5 +13,5 @@ public class FrameState
 	
 	public InlineKeyboardMarkup Ikm { get; set; }
 	
-	public Image Image { get; set; }
+	public List<Image> Images { get; set; }
 }

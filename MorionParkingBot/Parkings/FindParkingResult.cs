@@ -8,5 +8,5 @@ public class FindParkingResult
 
 	public bool IsFreeParkingFind { get; set; }
 
-	public Image Image { get; set; }
+	public List<Image> Images { get; set; }
 }

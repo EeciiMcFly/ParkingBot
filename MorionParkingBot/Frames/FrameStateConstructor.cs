@@ -373,13 +373,13 @@ public class FrameStateConstructor
 		return new List<FrameState> {firstFrameState, secondFrameState};
 	}
 
-	public List<FrameState> ConstructFoundParkingFrame(long chatId, Image image)
+	public List<FrameState> ConstructFoundParkingFrame(long chatId, List<Image> images)
 	{
 		var firstFrameState = new FrameState
 		{
 			ChatId = chatId,
 			MessageText = MessageConstants.ParkingFound,
-			Image = image
+			Images = images
 		};
 		
 		var ikm = new InlineKeyboardMarkup(new[]

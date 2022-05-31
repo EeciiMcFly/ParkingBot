@@ -55,6 +55,8 @@ public class ParkingsService : IParkingsService
 			var cameraToProcess = cameras.FirstOrDefault(x => x.Id == currentProcessParking.Key);
 			const double penWidthFactor = 0.002;
 			var realtimeImage = await _serverInfoProvider.GetRealtimeFrameFromServer(cameraToProcess);
+			if (realtimeImage == null)
+				continue;
 			foreach (var parkingsInfo in currentProcessParking.Value)
 			{
 				var pointLT = parkingsInfo.Points.PointLT.ToImagePointF(realtimeImage.Width, realtimeImage.Height);

@@ -9,8 +9,8 @@ public class PromoCodeService : IPromoCodeService
 	private readonly IUsersService _usersService;
 	private readonly ILogger _logger;
 
-	public PromoCodeService(IPromoCodeRepository promoCodeRepository, 
-		IUsersService usersService, 
+	public PromoCodeService(IPromoCodeRepository promoCodeRepository,
+		IUsersService usersService,
 		ILogger logger)
 	{
 		_promoCodeRepository = promoCodeRepository;
@@ -44,13 +44,14 @@ public class PromoCodeService : IPromoCodeService
 			DateTimeKind.Utc);
 		if (isLicenseActive)
 			licenseStartTime = user.LicenseInfos.First().ExpirationTime;
-		
+
 		_logger.Information($"PromoCodeType - {promoCode.PromoCodeType}");
 		if (promoCode.PromoCodeType == PromoCodeType.ForMonth)
 			user.LicenseInfos.First().ExpirationTime = licenseStartTime.AddMonths(1);
 		if (promoCode.PromoCodeType == PromoCodeType.ForYear)
 			user.LicenseInfos.First().ExpirationTime = licenseStartTime.AddYears(1);
 		promoCode.IsActivated = true;
+		promoCode.UserId = user.Id;
 		_logger.Information($"New ExpirationTime - {user.LicenseInfos.First().ExpirationTime}");
 		await _usersService.UpdateUserAsync(user);
 		await _promoCodeRepository.UpdatePromoCodeAsync(promoCode);

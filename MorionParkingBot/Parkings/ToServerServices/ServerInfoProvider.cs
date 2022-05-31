@@ -38,22 +38,29 @@ public class ServerInfoProvider
 
 	public async Task<Image> GetRealtimeFrameFromServer(CameraData camera)
 	{
-		var server = camera.Server;
-		var requestUrl = $"{server.ServerUrl}/site?login={server.Login}&channelid={camera.CameraId}&resolutionx=1600&resolutiony=900";
-		var httpClient = new HttpClient();
-		var stream = await httpClient.GetStreamAsync(requestUrl);
-		var config = Configuration.Default;
-		config.MaxDegreeOfParallelism = 1;
-		Image image;
-		using (var ms = new MemoryStream())
+		try
 		{
-			await stream.CopyToAsync(ms);
-			ms.Position = 0;
-			var imageDecoder = new JpegDecoder();
-			image = Image.Load(config, ms, imageDecoder);
-		}
-		stream.Close();
+			var server = camera.Server;
+			var requestUrl = $"{server.ServerUrl}/site?login={server.Login}&channelid={camera.CameraId}&resolutionx=1600&resolutiony=900";
+			var httpClient = new HttpClient();
+			var stream = await httpClient.GetStreamAsync(requestUrl);
+			var config = Configuration.Default;
+			config.MaxDegreeOfParallelism = 1;
+			Image image;
+			using (var ms = new MemoryStream())
+			{
+				await stream.CopyToAsync(ms);
+				ms.Position = 0;
+				var imageDecoder = new JpegDecoder();
+				image = Image.Load(config, ms, imageDecoder);
+			}
+			stream.Close();
 
-		return image;
+			return image;
+		}
+		catch (Exception e)
+		{
+			return null;
+		}
 	}
 }

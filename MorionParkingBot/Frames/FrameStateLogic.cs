@@ -1,4 +1,5 @@
-﻿using MorionParkingBot.Parkings;
+﻿using MorionParkingBot.Metrics;
+using MorionParkingBot.Parkings;
 using MorionParkingBot.Users;
 
 namespace MorionParkingBot.Frames;
@@ -8,14 +9,17 @@ public class FrameStateLogic
 	private readonly FrameStateConstructor _frameStateConstructor;
 	private readonly IUsersService _usersService;
 	private readonly IParkingsService _parkingsService;
+	private readonly IUsingService _usingService;
 
-	public FrameStateLogic(FrameStateConstructor frameStateConstructor, 
-		IUsersService usersService, 
-		IParkingsService parkingsService)
+	public FrameStateLogic(FrameStateConstructor frameStateConstructor,
+		IUsersService usersService,
+		IParkingsService parkingsService,
+		IUsingService usingService)
 	{
 		_frameStateConstructor = frameStateConstructor;
 		_usersService = usersService;
 		_parkingsService = parkingsService;
+		_usingService = usingService;
 	}
 
 	public async Task<List<FrameState>> GetStartStateForUser(BotContext botContext)
@@ -100,21 +104,24 @@ public class FrameStateLogic
 			return new List<FrameState> {startState};
 		}
 
+		await _usingService.CreateUsingAsync(user);
 		var parkings = await _parkingsService.GetParkingForIkmAsync();
 		var isBigCount = parkings.Count > 4;
 
 		var states = new List<FrameState>();
 		if (isBigCount)
 		{
-			var state = _frameStateConstructor.ConstructPluralFindParkingFrame(botContext.ChatId, botContext.MessageId, parkings);
+			var state = _frameStateConstructor.ConstructPluralFindParkingFrame(botContext.ChatId, botContext.MessageId,
+				parkings);
 			states.Add(state);
 		}
 		else
 		{
-			var state = _frameStateConstructor.ConstructSingleFindParkingFrame(botContext.ChatId, botContext.MessageId, parkings);
+			var state = _frameStateConstructor.ConstructSingleFindParkingFrame(botContext.ChatId, botContext.MessageId,
+				parkings);
 			states.Add(state);
 		}
-		
+
 		return states;
 	}
 
@@ -132,7 +139,8 @@ public class FrameStateLogic
 		var portionNumber = Convert.ToInt32(botContext.CallbackData.Split(":")[1]);
 		var parkings = await _parkingsService.GetParkingForIkmAsync();
 		var states = new List<FrameState>();
-		var state = _frameStateConstructor.ConstructNextPortionFrame(botContext.ChatId, botContext.MessageId, portionNumber, parkings);
+		var state = _frameStateConstructor.ConstructNextPortionFrame(botContext.ChatId, botContext.MessageId,
+			portionNumber, parkings);
 		states.Add(state);
 		return states;
 	}

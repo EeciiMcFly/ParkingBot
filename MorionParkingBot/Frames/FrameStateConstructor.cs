@@ -15,6 +15,10 @@ public class FrameStateConstructor
 			{
 				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
 				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			},
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Уведомления", CallbackDataConstants.NotificationQuery), 
 			}
 		});
 
@@ -112,6 +116,10 @@ public class FrameStateConstructor
 			{
 				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
 				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			},
+			new[]
+			{
+			InlineKeyboardButton.WithCallbackData("Уведомления", CallbackDataConstants.NotificationQuery), 
 			}
 		});
 
@@ -201,6 +209,10 @@ public class FrameStateConstructor
 			{
 				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
 				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			}, 
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Уведомления", CallbackDataConstants.NotificationQuery), 
 			}
 		});
 
@@ -360,6 +372,10 @@ public class FrameStateConstructor
 			{
 				InlineKeyboardButton.WithCallbackData("Найди парковку", CallbackDataConstants.FindParkingQuery),
 				InlineKeyboardButton.WithCallbackData("Ввести промокод", CallbackDataConstants.ActivateCode)
+			},
+			new[]
+			{
+				InlineKeyboardButton.WithCallbackData("Уведомления", CallbackDataConstants.NotificationQuery), 
 			}
 		});
 

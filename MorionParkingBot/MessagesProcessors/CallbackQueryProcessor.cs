@@ -36,6 +36,10 @@ public class CallbackQueryProcessor
 				await ProcessFindParking(botContext);
 				break;
 			
+			case CallbackDataConstants.NotificationQuery:
+				await ProcessNotification(botContext);
+				break;
+			
 			default:
 				if (botContext.CallbackData.Contains("parkingId"))
 					await ProcessParkingId(botContext);
@@ -113,5 +117,10 @@ public class CallbackQueryProcessor
 			else
 				await _telegramBotClient.SendTextMessageAsync(currentState.ChatId, currentState.MessageText);
 		}
+	}
+
+	private async Task ProcessNotification(BotContext botContext)
+	{
+		// var state = await _frameStateLogic.
 	}
 }

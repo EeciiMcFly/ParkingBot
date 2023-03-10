@@ -9,15 +9,6 @@ public class QueueModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.Register(c =>
-            {
-                var telegramBotClient = new TelegramBotClient("");
-
-                return telegramBotClient;
-            })
-            .As<TelegramBotClient>()
-            .SingleInstance();
-        
         builder.RegisterType<InputMessageQueue>()
             .As<IInputMessageQueue>()
             .SingleInstance();

@@ -1,4 +1,5 @@
-﻿using Telegram.Bot;
+﻿using MorionParkingBot.Frames;
+using Telegram.Bot;
 
 namespace MorionParkingBot.MessageQueue;
 
@@ -41,13 +42,28 @@ public class MessageSender : IMessageSender
                 await Task.Delay(15, cancellationToken);
                 continue;
             }
-                
-            if (message.Ikm != null)
-                await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                    replyMarkup: message.Ikm, cancellationToken: cancellationToken);
+
+            if (message.MessageType == MessageType.Send)
+            {
+                if (message.Ikm != null)
+                    await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
+                        replyMarkup: message.Ikm, cancellationToken: cancellationToken);
+                else
+                    await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
+                        cancellationToken: cancellationToken);
+            }
             else
-                await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                    cancellationToken: cancellationToken);
+            {
+                if (message.Ikm != null)
+                    await telegramBotClient.EditMessageTextAsync(message.ChatId,
+                        message.MessageId, message.MessageText, replyMarkup: message.Ikm,
+                        cancellationToken: cancellationToken);
+                else
+                {
+                    await telegramBotClient.EditMessageTextAsync(message.ChatId,
+                        message.MessageId, message.MessageText, cancellationToken: cancellationToken);
+                }
+            }
         }
     }
 }

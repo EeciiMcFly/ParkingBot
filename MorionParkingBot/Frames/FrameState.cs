@@ -11,7 +11,7 @@ public class FrameState
 	
 	public string MessageText { get; set; }
 	
-	public InlineKeyboardMarkup Ikm { get; set; }
+	public InlineKeyboardMarkup? Ikm { get; set; }
 	
 	public List<Image> Images { get; set; }
 }

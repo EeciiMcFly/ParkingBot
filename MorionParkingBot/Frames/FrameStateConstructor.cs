@@ -7,6 +7,22 @@ namespace MorionParkingBot.Frames;
 
 public class FrameStateConstructor
 {
+	public List<FrameState> ConstructStartFrame(long chatId)
+	{
+		var firstFrameState = new FrameState
+		{
+			ChatId = chatId,
+			MessageText = "Привет это Йога бот!",
+		};
+
+		var frameStateList = new List<FrameState>
+		{
+			firstFrameState
+		};
+
+		return frameStateList;
+	}
+
 	public FrameState ConstructStartFrameForActiveLicense(long chatId)
 	{
 		var ikm = new InlineKeyboardMarkup(new[]

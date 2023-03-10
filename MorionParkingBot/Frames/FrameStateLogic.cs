@@ -24,16 +24,9 @@ public class FrameStateLogic
 
 	public async Task<List<FrameState>> GetStartStateForUser(BotContext botContext)
 	{
-		var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
-		var isLicenseActive = user.LicenseInfos.First().ExpirationTime > DateTime.UtcNow;
+		//var user = await _usersService.GetOrCreateUserAsync(botContext.TelegramUserId);
 
-		if (isLicenseActive)
-		{
-			var state = _frameStateConstructor.ConstructStartFrameForActiveLicense(botContext.ChatId);
-			return new List<FrameState> {state};
-		}
-
-		var states = _frameStateConstructor.ConstructStartFrameForInactiveLicense(botContext.ChatId);
+		var states = _frameStateConstructor.ConstructStartFrame(botContext.ChatId);
 		return states;
 	}
 

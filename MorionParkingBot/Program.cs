@@ -9,6 +9,7 @@ builder.UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBui
 	containerBuilder.RegisterModule<UsersModule>();
 	containerBuilder.RegisterModule<PromoCodesModule>();
 	containerBuilder.RegisterModule<FramesModules>();
+	containerBuilder.RegisterModule<QueueModule>();
 	containerBuilder.RegisterModule<MessageProcessorsModules>();
 	containerBuilder.RegisterModule<ParkingsModule>();
 	containerBuilder.RegisterModule<LoggingModule>();

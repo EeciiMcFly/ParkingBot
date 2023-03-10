@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using MorionParkingBot.MessageQueue;
 using MorionParkingBot.MessagesProcessors;
+using Telegram.Bot;
 
 namespace MorionParkingBot.Modules;
 
@@ -8,6 +9,15 @@ public class QueueModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
+        builder.Register(c =>
+            {
+                var telegramBotClient = new TelegramBotClient("5702939362:AAE3HKbDkgrMKhRUzpVYEjToFUgt8WQi7s8");
+
+                return telegramBotClient;
+            })
+            .As<TelegramBotClient>()
+            .SingleInstance();
+        
         builder.RegisterType<InputMessageQueue>()
             .As<IInputMessageQueue>()
             .SingleInstance();

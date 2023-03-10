@@ -1,8 +1,6 @@
 ﻿using MorionParkingBot.Frames;
 using MorionParkingBot.MessageQueue;
-using MorionParkingBot.PromoCodes;
 using Telegram.Bot;
-using ILogger = Serilog.ILogger;
 
 namespace MorionParkingBot.MessagesProcessors;
 
@@ -10,21 +8,17 @@ public class MessagesProcessor
 {
 	private readonly TelegramBotClient _telegramBotClient;
 	//private readonly ChatId _myChatId = new("340612851");
-
-
-	private readonly FrameStateLogic _frameStateLogic;
+	
 	private readonly IInputMessageQueue inputMessageQueue;
 	private readonly IOutputMessageQueue outputMessageQueue;
 
 	private CancellationTokenSource cancellationTokenSource;
 
 	public MessagesProcessor(TelegramBotClient telegramBotClient,
-		FrameStateLogic frameStateLogic, 
 		IInputMessageQueue inputMessageQueue,
 		IOutputMessageQueue outputMessageQueue)
 	{
 		_telegramBotClient = telegramBotClient;
-		_frameStateLogic = frameStateLogic;
 		this.inputMessageQueue = inputMessageQueue;
 		this.outputMessageQueue = outputMessageQueue;
 	}
@@ -43,8 +37,18 @@ public class MessagesProcessor
 
 	private async Task ProcessStartMessageAsync(BotContext botContext)
 	{
-		var states = await _frameStateLogic.GetStartStateForUser(botContext);
-		foreach (var currentState in states)
+		var firstFrameState = new FrameState
+		{
+			ChatId = botContext.ChatId,
+			MessageText = "Привет это Йога бот!",
+		};
+
+		var frameStateList = new List<FrameState>
+		{
+			firstFrameState
+		};
+
+		foreach (var currentState in frameStateList)
 		{
 			outputMessageQueue.AddMessage(currentState);
 			/*if (currentState.Ikm != null)

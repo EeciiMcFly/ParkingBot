@@ -6,14 +6,9 @@ var builder = Host.CreateDefaultBuilder(args);
 
 builder.UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBuilder =>
 {
-	containerBuilder.RegisterModule<UsersModule>();
-	containerBuilder.RegisterModule<PromoCodesModule>();
-	containerBuilder.RegisterModule<FramesModules>();
 	containerBuilder.RegisterModule<MessageProcessorsModules>();
-	containerBuilder.RegisterModule<ParkingsModule>();
-	containerBuilder.RegisterModule<LoggingModule>();
-	containerBuilder.RegisterModule<UsingModules>();
-	containerBuilder.RegisterModule<ParkingScheduleModule>();
+	containerBuilder.RegisterModule<BotModule>();
+	containerBuilder.RegisterModule<QueueModule>();
 }));
 
 IHost host = builder

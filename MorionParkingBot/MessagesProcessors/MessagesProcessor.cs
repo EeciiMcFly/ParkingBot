@@ -1,20 +1,19 @@
-﻿using Telegram.Bot;
-using ILogger = Serilog.ILogger;
+﻿using MorionParkingBot.Frames;
+using MorionParkingBot.MessageQueue;
 
 namespace MorionParkingBot.MessagesProcessors;
 
 public class MessagesProcessor
 {
-	private readonly TelegramBotClient _telegramBotClient;
 	//private readonly ChatId _myChatId = new("340612851");
 
-	private readonly ILogger _logger;
+	private readonly IOutputMessageQueue outputMessageQueue;
 
-	public MessagesProcessor(TelegramBotClient telegramBotClient,
-		ILogger logger)
+	private CancellationTokenSource cancellationTokenSource;
+
+	public MessagesProcessor(IOutputMessageQueue outputMessageQueue)
 	{
-		_telegramBotClient = telegramBotClient;
-		_logger = logger;
+		this.outputMessageQueue = outputMessageQueue;
 	}
 
 	public async Task ProcessMessage(BotContext botContext)
@@ -22,20 +21,25 @@ public class MessagesProcessor
 		if (botContext.MessageText == "/start")
 		{
 			await ProcessStartMessageAsync(botContext);
-			
-			return;
 		}
-
-		await ProcessPromoCodeMessageAsync(botContext);
 	}
 
 	private async Task ProcessStartMessageAsync(BotContext botContext)
 	{
-		_logger.Information($"Process start command for user - {botContext.TelegramUserId}");
-	}
+		var firstFrameState = new FrameState
+		{
+			ChatId = botContext.ChatId,
+			MessageText = "Привет это Йога бот!",
+		};
 
-	private async Task ProcessPromoCodeMessageAsync(BotContext botContext)
-	{
-		_logger.Information($"Process promocode data for user - {botContext.TelegramUserId}");
+		var frameStateList = new List<FrameState>
+		{
+			firstFrameState
+		};
+
+		foreach (var currentState in frameStateList)
+		{
+			outputMessageQueue.AddMessage(currentState);
+		}
 	}
 }

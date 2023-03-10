@@ -2,6 +2,7 @@
 using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
+using YogaBot.Storage.Events;
 
 namespace YogaBot.Dialogs;
 
@@ -18,7 +19,7 @@ public class CreateEventDialog : IDialog<BotContext>
 
     public void StartDialog(BotContext context)
     {
-        var message = "Введите дату события и стоимость в формате: \n 10.03.2022 15:00\n1500";
+        var message = "Введите название события, дату и стоимость в формате: \nЙога \n10.03.2022 15:00\n1500";
         var answer = new FrameState
         {
             ChatId = context.ChatId,
@@ -26,7 +27,7 @@ public class CreateEventDialog : IDialog<BotContext>
         };
 
         //TODO userId вместо TelegramUserId
-        dialogStateSetter.SetState(context.TelegramUserId, ProcessEventData);
+        dialogStateSetter.SetState(context.TelegramUserId, ctx => ProcessArrangementData(ctx, context.CallbackData));
         outputMessageQueue.AddMessage(answer);
     }
 
@@ -35,13 +36,22 @@ public class CreateEventDialog : IDialog<BotContext>
         if (context.CallbackData == null)
             return false;
             
-        return context.CallbackData.Equals(CallbackDataConstants.CreateEvent);
+        return context.CallbackData.Contains(CallbackDataConstants.CreateEvent);
     }
 
     public int Priority => 10;
 
-    private async void ProcessEventData(BotContext context)
+    private async void ProcessArrangementData(BotContext context, string callbackData)
     {
-        //парсим данные и создаем событие
+        var eventInfo = context.MessageText.Split("\n").Select(x => x.Trim()).ToList();
+
+        var newEvent = new EventData
+        {
+            Id = BitConverter.ToInt64(Guid.NewGuid().ToByteArray()),
+            ArrangementId = 0,//(long)Convert.ToDouble(callbackData),
+            Cost = Convert.ToInt32(eventInfo[2]),
+            Name = eventInfo[0],
+            Date = DateTime.Parse(eventInfo[1])
+        };
     }
 }

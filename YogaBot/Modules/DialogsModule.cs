@@ -17,8 +17,8 @@ public class DialogsModule : Module
             .As<IDialog<BotContext>>()
             .SingleInstance();
         
-        builder.RegisterType<ActivityDialog>()
-            .As<ActivityDialog>()
+        builder.RegisterType<ArrangementDialog>()
+            .As<ArrangementDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
     }

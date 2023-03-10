@@ -3,32 +3,42 @@ using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
 using Telegram.Bot.Types.ReplyMarkups;
+using YogaBot.Storage.Arrangements;
+using YogaBot.Storage.Users;
 
 namespace YogaBot.Dialogs;
 
-public class ActivityDialog : IDialog<BotContext>
+public class ArrangementDialog : IDialog<BotContext>
 {
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
-
-    public ActivityDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter)
+    private readonly IArrangementRepository arrangementRepository;
+    private readonly IUsersRepository usersRepository;
+    
+    public ArrangementDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
+        IArrangementRepository arrangementRepository, IUsersRepository usersRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
+        this.arrangementRepository = arrangementRepository;
+        this.usersRepository = usersRepository;
     }
 
-    public void StartDialog(BotContext context)
+    public async void StartDialog(BotContext context)
     {
         /*var eventCount = 1;
         var ggg = eventCount > 6 ? ConstructPluralFindParkingFrame() : ConstructSingleFindParkingFrame();*/
 
+        var innerUserId = await usersRepository.GetUserAsync(context.TelegramUserId) 
+            ?? throw new Exception("You do not exist");
+        var arrangements = await arrangementRepository.GetArrangementForUserAsync(innerUserId.Id);
+
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.Back),
-            },
+            arrangements.Select(x => InlineKeyboardButton.WithCallbackData(x.Name, x.Id.ToString()))
+                .Concat(new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.Back)})
         });
+        
         var answer = new FrameState
         {
             ChatId = context.ChatId,
@@ -38,7 +48,7 @@ public class ActivityDialog : IDialog<BotContext>
             Ikm = ikm
         };
 
-        dialogStateSetter.SetState(context.TelegramUserId, ProcessEventId);
+        dialogStateSetter.SetState(context.TelegramUserId, ProcessArrangementId);
         outputMessageQueue.AddMessage(answer);
     }
 
@@ -50,12 +60,33 @@ public class ActivityDialog : IDialog<BotContext>
         return context.CallbackData.Equals(CallbackDataConstants.MyActivities);
     }
 
-    public void ProcessEventId(BotContext context)
+    public void ProcessArrangementId(BotContext context)
     {
         if (context.CallbackData.Equals(CallbackDataConstants.Back))
         {
             dialogStateSetter.ClearState(context.TelegramUserId);
             return;
+        }
+
+        if (context.CallbackData.Equals("yoga_id"))
+        {
+            var ikm = new InlineKeyboardMarkup(new[]
+            {
+                new[]
+                {
+                    InlineKeyboardButton.WithCallbackData("Создать событие", CallbackDataConstants.CreateEvent+"yoga_id"),
+                },
+            });
+            var answer = new FrameState
+            {
+                ChatId = context.ChatId,
+                MessageId = context.MessageId,
+                MessageType = MessageType.Change,
+                MessageText = "Создайте событие",
+                Ikm = ikm
+            };
+            
+            outputMessageQueue.AddMessage(answer);
         }
     }
 

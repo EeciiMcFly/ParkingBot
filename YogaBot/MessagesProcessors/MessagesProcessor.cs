@@ -1,7 +1,7 @@
-﻿using MorionParkingBot.Frames;
-using MorionParkingBot.MessageQueue;
+﻿using YogaBot.Frames;
+using YogaBot.MessageQueue;
 
-namespace MorionParkingBot.MessagesProcessors;
+namespace YogaBot.MessagesProcessors;
 
 public class MessagesProcessor
 {

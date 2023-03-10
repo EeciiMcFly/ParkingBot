@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using Telegram.Bot;
 
-namespace MorionParkingBot.Modules;
+namespace YogaBot.Modules;
 
 public class BotModule : Module
 {
@@ -13,7 +13,7 @@ public class BotModule : Module
 
         builder.Register(c =>
             {
-                var telegramBotClient = new TelegramBotClient("5702939362:AAE3HKbDkgrMKhRUzpVYEjToFUgt8WQi7s8");
+                var telegramBotClient = new TelegramBotClient("");
 
                 return telegramBotClient;
             })

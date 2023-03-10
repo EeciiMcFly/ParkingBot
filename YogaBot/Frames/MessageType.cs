@@ -3,5 +3,6 @@
 public enum MessageType
 {
     Send,
-    Change
+    Change,
+    Poll
 }

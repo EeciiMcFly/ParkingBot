@@ -31,18 +31,4 @@ public class UsersRepository : IUsersRepository
 
 		await _userDbContext.SaveChangesAsync();
 	}
-
-	public async Task AddNewLicenseAsync(LicenseInfo licenseInfo)
-	{
-		await _userDbContext.LicenseInfos.AddAsync(licenseInfo);
-
-		await _userDbContext.SaveChangesAsync();
-	}
-
-	public async Task UpdateLicenseAsync(LicenseInfo licenseInfo)
-	{
-		_userDbContext.LicenseInfos.Update(licenseInfo);
-
-		await _userDbContext.SaveChangesAsync();
-	}
 }

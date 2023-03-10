@@ -14,8 +14,6 @@ public class UserDbContext : DbContext
 	}
 
 	public DbSet<UserData> Users { get; set; }
-	
-	public DbSet<LicenseInfo> LicenseInfos { get; set; }
 
 	// Метод переопределяется для создания миграций
 	// При работе сервиса контекст определяется в autofac и IsConfigured будет true

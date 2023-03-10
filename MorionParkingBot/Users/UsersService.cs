@@ -22,15 +22,7 @@ public class UsersService : IUsersService
 			await _usersRepository.AddNewUserAsync(newUserData);
 
 			var createdUser = await _usersRepository.GetUserAsync(telegramUserId);
-			var newLicenseInfo = new LicenseInfo
-			{
-				UserId = createdUser.Id,
-				User = createdUser,
-				ExpirationTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 0, 0, 0, DateTimeKind.Utc)
-			};
 
-			await _usersRepository.AddNewLicenseAsync(newLicenseInfo);
-			createdUser.LicenseInfos = new List<LicenseInfo> {newLicenseInfo};
 			await _usersRepository.UpdateUserAsync(createdUser);
 			user = createdUser;
 		}

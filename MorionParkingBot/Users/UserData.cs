@@ -8,6 +8,4 @@ public class UserData
 	public long Id { get; set; }
 
 	public long TelegramUserId { get; set; }
-
-	public List<LicenseInfo> LicenseInfos { get; set; }
 }

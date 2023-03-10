@@ -7,8 +7,4 @@ public interface IUsersRepository
 	public Task AddNewUserAsync(UserData userData);
 
 	public Task UpdateUserAsync(UserData user);
-
-	public Task AddNewLicenseAsync(LicenseInfo licenseInfo);
-
-	public Task UpdateLicenseAsync(LicenseInfo licenseInfo);
 }

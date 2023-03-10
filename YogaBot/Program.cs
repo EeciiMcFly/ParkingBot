@@ -6,8 +6,10 @@ var builder = Host.CreateDefaultBuilder(args);
 
 builder.UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBuilder =>
 {
-	containerBuilder.RegisterModule<MessageProcessorsModules>();
 	containerBuilder.RegisterModule<BotModule>();
+	containerBuilder.RegisterModule<DialogEngineModule>();
+	containerBuilder.RegisterModule<DialogsModule>();
+	containerBuilder.RegisterModule<MessageProcessorsModules>();
 	containerBuilder.RegisterModule<QueueModule>();
 }));
 

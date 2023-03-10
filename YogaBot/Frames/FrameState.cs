@@ -5,6 +5,7 @@ namespace YogaBot.Frames;
 
 public class FrameState
 {
+	public MessageType MessageType { get; set; } = MessageType.Send;
 	public long ChatId { get; set; }
 	
 	public int MessageId { get; set; }

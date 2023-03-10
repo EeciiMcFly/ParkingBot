@@ -43,9 +43,18 @@ public class MessageQueueProcessor : IMessageQueueProcessor
                 continue;
             }
 
-            using var scope = serviceProvider.CreateAsyncScope(); 
-            var messagesProcessor = scope.ServiceProvider.GetService(typeof(MessagesProcessor)) as MessagesProcessor; 
-            await messagesProcessor.ProcessMessage(message);
+            using var scope = serviceProvider.CreateAsyncScope();
+            
+            if (message.CallbackData != null)
+            {
+                var callbackQueryProcessor = scope.ServiceProvider.GetService(typeof(CallbackQueryProcessor)) as CallbackQueryProcessor;
+                await callbackQueryProcessor.ProcessCallbackQuery(message);
+            }
+            else
+            {
+                var messagesProcessor = scope.ServiceProvider.GetService(typeof(MessagesProcessor)) as MessagesProcessor; 
+                await messagesProcessor.ProcessMessage(message);
+            }
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using YogaBot.Frames;
-using YogaBot.MessageQueue;
+﻿using YogaBot.DialogEngine;
 
 namespace YogaBot.MessagesProcessors;
 
@@ -7,39 +6,25 @@ public class MessagesProcessor
 {
 	//private readonly ChatId _myChatId = new("340612851");
 
-	private readonly IOutputMessageQueue outputMessageQueue;
+	private readonly IDialogStateStorage dialogStateStorage;
+	private readonly IDialogSelector dialogSelector;
 
-	private CancellationTokenSource cancellationTokenSource;
-
-	public MessagesProcessor(IOutputMessageQueue outputMessageQueue)
+	public MessagesProcessor(IDialogStateStorage dialogStateStorage, IDialogSelector dialogSelector)
 	{
-		this.outputMessageQueue = outputMessageQueue;
+		this.dialogStateStorage = dialogStateStorage;
+		this.dialogSelector = dialogSelector;
 	}
 
 	public async Task ProcessMessage(BotContext botContext)
 	{
-		if (botContext.MessageText == "/start")
+		var userAction = dialogStateStorage.GetUserState(botContext.TelegramUserId);
+		if (userAction != null)
 		{
-			await ProcessStartMessageAsync(botContext);
+			userAction(botContext);
+			return;
 		}
-	}
 
-	private async Task ProcessStartMessageAsync(BotContext botContext)
-	{
-		var firstFrameState = new FrameState
-		{
-			ChatId = botContext.ChatId,
-			MessageText = "Привет это Йога бот!",
-		};
-
-		var frameStateList = new List<FrameState>
-		{
-			firstFrameState
-		};
-
-		foreach (var currentState in frameStateList)
-		{
-			outputMessageQueue.AddMessage(currentState);
-		}
+		var dialog = dialogSelector.SelectDialog(botContext);
+		dialog.StartDialog(botContext);
 	}
 }

@@ -32,7 +32,6 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
-				
 				var messageContext = new BotContext
 				{
 					ChatId = update.Message.Chat.Id,
@@ -47,7 +46,7 @@ public class Worker : IHostedService
 
 			if (update.Type == UpdateType.CallbackQuery)
 			{
-				var botContext = new BotContext
+				var messageContext = new BotContext
 				{
 					ChatId = update.CallbackQuery.From.Id,
 					TelegramUserId = update.CallbackQuery.From.Id,
@@ -55,9 +54,7 @@ public class Worker : IHostedService
 					CallbackData = update.CallbackQuery.Data
 				};
 				
-				using var scope = serviceProvider.CreateAsyncScope();
-				var callbackQueryProcessor = scope.ServiceProvider.GetService(typeof(CallbackQueryProcessor)) as CallbackQueryProcessor;
-				await callbackQueryProcessor.ProcessCallbackQuery(botContext);
+				inputMessageQueue.AddMessage(messageContext);
 			}
 		}
 		catch (Exception e)

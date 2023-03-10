@@ -32,9 +32,8 @@ public class UsersModule : Module
 		
 		builder.Register(c =>
 			{
-				var telegramBotClient = new TelegramBotClient("5257347533:AAH_EZtoPXtadAkchdMbCzP-h6t4SQhLjFc");
-				//var telegramBotClient = new TelegramBotClient("5225586467:AAH4AKYDeJc0tIaBggMv_Arhz3uVx7giJK8");
-				
+				var telegramBotClient = new TelegramBotClient("5702939362:AAE3HKbDkgrMKhRUzpVYEjToFUgt8WQi7s8");
+
 				return telegramBotClient;
 			})
 			.As<TelegramBotClient>()

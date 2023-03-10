@@ -11,7 +11,7 @@ public class QueueModule : Module
     {
         builder.Register(c =>
             {
-                var telegramBotClient = new TelegramBotClient("5702939362:AAE3HKbDkgrMKhRUzpVYEjToFUgt8WQi7s8");
+                var telegramBotClient = new TelegramBotClient("");
 
                 return telegramBotClient;
             })

@@ -45,7 +45,8 @@ public class GetEventsDialog : IDialog<BotContext>
         {
             new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.SelectArrangement + "/" + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
         });
         var answer = new FrameState
         {

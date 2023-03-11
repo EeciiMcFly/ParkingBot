@@ -14,7 +14,6 @@ public class Worker : IHostedService
 	private readonly IInputMessageQueue inputMessageQueue;
 	private readonly IMessageSender messageSender;
 	private readonly IMessageQueueProcessor messagesProcessor;
-	private readonly IChatMemberProcessor chatMemberProcessor;
 
 	public Worker(TelegramBotClient telegramBotClient, IServiceProvider serviceProvider,
 		IInputMessageQueue inputMessageQueue, IMessageSender messageSender,
@@ -25,7 +24,6 @@ public class Worker : IHostedService
 		this.inputMessageQueue = inputMessageQueue;
 		this.messageSender = messageSender;
 		this.messagesProcessor = messagesProcessor;
-		this.chatMemberProcessor = chatMemberProcessor;
 	}
 
 	private async Task HandleMessage(ITelegramBotClient telegramBotClient, Update update, CancellationToken arg3)
@@ -37,6 +35,8 @@ public class Worker : IHostedService
 				if (update.Message.Type == MessageType.ChatMemberLeft ||
 				    update.Message.Type == MessageType.ChatMembersAdded)
 				{
+					using var scope = serviceProvider.CreateAsyncScope();
+					var chatMemberProcessor = scope.ServiceProvider.GetService(typeof(IChatMemberProcessor)) as IChatMemberProcessor;
 					chatMemberProcessor.ProcessChatMember(update);
 					return;
 				}
@@ -68,7 +68,9 @@ public class Worker : IHostedService
 
 			if (update.Type == UpdateType.MyChatMember)
 			{
-				chatMemberProcessor.ProcessChat(update);
+				using var scope = serviceProvider.CreateAsyncScope();
+				var chatMemberProcessor = scope.ServiceProvider.GetService(typeof(IChatMemberProcessor)) as IChatMemberProcessor;
+				chatMemberProcessor.ProcessChatAsync(update);
 			}
 		}
 		catch (Exception e)

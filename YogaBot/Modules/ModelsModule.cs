@@ -9,6 +9,6 @@ public class ModelsModule : Module
     {
         builder.RegisterType<ChatMemberProcessor>()
             .As<IChatMemberProcessor>()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
     }
 }

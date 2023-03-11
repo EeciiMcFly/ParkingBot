@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using YogaBot.Models.ChatMember;
+using YogaBot.Models.InfoProvider;
 using YogaBot.Models.Poll;
 
 namespace YogaBot.Modules;
@@ -15,5 +16,9 @@ public class ModelsModule : Module
         builder.RegisterType<PollAnswerProcessor>()
             .As<IPollAnswerProcessor>()
             .InstancePerLifetimeScope();
+
+        builder.RegisterType<InfoProvider>()
+            .As<InfoProvider>()
+            .SingleInstance();
     }
 }

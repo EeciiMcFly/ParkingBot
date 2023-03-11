@@ -8,6 +8,8 @@ namespace YogaBot.Storage.Events
 
         Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId);
 
+        Task<IEnumerable<Event?>> GetEventsForPeriodAndArrangementAsync(DateTime start, DateTime end, long arrangementId);
+
         Task AddEventAsync(Event @event);
 
         Task DeleteEventAsync(long eventId);
@@ -33,6 +35,13 @@ namespace YogaBot.Storage.Events
             return eventData;
         }
 
+        public async Task<IEnumerable<Event?>> GetEventsForPeriodAndArrangementAsync(DateTime start, DateTime end, long arrangementId)
+        {
+            var events = await _userDbContext.Events.Where(data => data.Date > start && data.Date < end && data.ArrangementId == arrangementId).ToListAsync();
+
+            return events;
+        }
+        
         public async Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId)
         {
             var events = await _userDbContext.Events.Where(data => data.ArrangementId == arrangementId).ToListAsync();

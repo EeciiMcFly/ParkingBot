@@ -40,6 +40,11 @@ public class ArrangementDialog : IDialog<BotContext>
                 InlineKeyboardButton.WithCallbackData("Удалить занятие",
                     CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)
             },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", 
+                    CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)
+            },
             new[] { InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities) }
         });
 

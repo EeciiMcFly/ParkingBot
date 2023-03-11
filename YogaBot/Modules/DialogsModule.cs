@@ -28,12 +28,18 @@ public class DialogsModule : Module
             .As<GetEventsDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
+        
+        builder.RegisterType<CalculateEventDialog>()
+            .As<CalculateEventDialog>()
+            .As<IDialog<BotContext>>()
+            .SingleInstance();
+        
 
         builder.RegisterType<ArrangementDialog>()
             .As<ArrangementDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
-
+        
         builder.RegisterType<GetArrangementsDialog>()
             .As<GetArrangementsDialog>()
             .As<IDialog<BotContext>>()

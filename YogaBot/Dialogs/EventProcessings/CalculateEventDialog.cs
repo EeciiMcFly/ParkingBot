@@ -1,32 +1,39 @@
-﻿using Telegram.Bot.Types.ReplyMarkups;
+﻿using System.Globalization;
+using Telegram.Bot.Types.ReplyMarkups;
 using YogaBot.Constants;
 using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
 using YogaBot.Storage.Arrangements;
 using YogaBot.Storage.Events;
+using YogaBot.Storage.Presences;
+using YogaBot.Storage.Users;
 
 namespace YogaBot.Dialogs.EventProcessings;
 
-public class CreateEventDialog : IDialog<BotContext>
+public class CalculateEventDialog : IDialog<BotContext>
 {
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
     private readonly IEventsRepository eventsRepository;
     private readonly IArrangementRepository arrangementRepository;
+    private readonly IUsersRepository usersRepository;
+    private readonly IPresenceRepository presenceRepository;
 
-    public CreateEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
-        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository)
+    public CalculateEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
+        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository, IUsersRepository usersRepository, IPresenceRepository presenceRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
         this.eventsRepository = eventsRepository;
         this.arrangementRepository = arrangementRepository;
+        this.usersRepository = usersRepository;
+        this.presenceRepository = presenceRepository;
     }
 
     public void StartDialog(BotContext context)
     {
-        var message = "Введите название события, дату и стоимость в формате: \nЙога \n10.03.2022 15:00\n1500";
+        var message = "Введите дату начала и дату конца в формате: \n10.03.2022 \n17.03.2022";
         var answer = new FrameState
         {
             ChatId = context.ChatId,
@@ -43,51 +50,39 @@ public class CreateEventDialog : IDialog<BotContext>
         if (context.CallbackData == null)
             return false;
             
-        return context.CallbackData.Contains(CallbackDataConstants.CreateEvent);
+        return context.CallbackData.Contains(CallbackDataConstants.CalculatePrice);
     }
 
     public int Priority => 10;
 
     private async void ProcessArrangementData(BotContext context, string callbackData)
     {
-        var eventInfo = context.MessageText.Split("\n").Select(x => x.Trim()).ToList();
-        var date = DateTime.Parse(eventInfo[1]).ToUniversalTime();
-        var message = string.Empty;
         var arrangementGuid = Int64.Parse(callbackData.Split('/')[1]);
+        var splittedText = context.MessageText.Split("\n");
+        var startDate = DateTime.Parse(splittedText[0]).ToUniversalTime();
+        var endDate = DateTime.Parse(splittedText[1]).ToUniversalTime();
+
+        var events = (await eventsRepository.GetEventsForPeriodAndArrangementAsync(startDate, endDate, arrangementGuid)).ToArray();
         
-        var arrangementEvents = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
-
-        if (arrangementEvents.FirstOrDefault(x => x.Date == date) == null)
+        var costs = await Task.WhenAll(events.Select(async x =>
         {
-            var newEvent = new Event
-            {
-                ArrangementId = Convert.ToInt64(callbackData.Split('/')[1]),
-                Cost = Convert.ToInt32(eventInfo[2]),
-                Name = eventInfo[0],
-                Date = DateTime.Parse(eventInfo[1]).ToUniversalTime()
-            };
-            await eventsRepository.AddEventAsync(newEvent);
-            message = "Событие успешно добавлено";
-        }
-        else
-        {
-            message = "Событие на данное время уже запланировано";
-        }
-
-        var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
+            var presencesCount = (await presenceRepository.GetPresencesForEventAsync(x.EventId)).Count();
+            return (double)x.Cost / presencesCount;
+        }));
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
         });
+        
         var answer = new FrameState
         {
             ChatId = context.ChatId,
             MessageType = MessageType.Send,
-            MessageText = message,
+            MessageText = Math.Round(costs.Sum(), 2).ToString(CultureInfo.InvariantCulture),
             Ikm = ikm
         };
             

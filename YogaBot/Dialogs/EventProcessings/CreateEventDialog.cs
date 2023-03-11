@@ -76,11 +76,11 @@ public class CreateEventDialog : IDialog<BotContext>
                 InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid),
             },
         });
+        
         var answer = new FrameState
         {
             ChatId = context.ChatId,
-            MessageId = context.MessageId,
-            MessageType = MessageType.Change,
+            MessageType = MessageType.Send,
             MessageText = arrangement.Name,
             Ikm = ikm
         };

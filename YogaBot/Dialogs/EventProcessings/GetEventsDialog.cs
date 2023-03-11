@@ -26,7 +26,7 @@ public class GetEventsDialog : IDialog<BotContext>
 
     public async void StartDialog(BotContext context)
     {
-        var arrangementGuid = new Guid(context.CallbackData.Split('/')[1]);
+        var arrangementGuid = Convert.ToInt64(context.CallbackData.Split('/')[1]);
 
         var events = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
         var message = string.Empty;

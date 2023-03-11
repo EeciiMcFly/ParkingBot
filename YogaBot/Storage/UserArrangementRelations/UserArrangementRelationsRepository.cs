@@ -4,11 +4,11 @@ namespace YogaBot.Storage.UserArrangementRelations
 {
     public interface IUserArrangementRelationsRepository
     {
-        Task<IEnumerable<UserArrangementRelationData?>> GetRelationsForUserAsync(Guid userId);
+        Task<IEnumerable<UserArrangementRelation?>> GetRelationsForUserAsync(long userId);
         
-        Task<IEnumerable<UserArrangementRelationData?>> GetRelationsForArrangementAsync(Guid arrangementId);
+        Task<IEnumerable<UserArrangementRelation?>> GetRelationsForArrangementAsync(long arrangementId);
 
-        Task AddUserEventRelationAsync(UserArrangementRelationData userArrangementRelationData);
+        Task AddUserEventRelationAsync(UserArrangementRelation userArrangementRelation);
     }
     
     public class UserArrangementRelationsRepository : IUserArrangementRelationsRepository
@@ -20,23 +20,23 @@ namespace YogaBot.Storage.UserArrangementRelations
             _userDbContext = userDbContext;
         }
 
-        public async Task<IEnumerable<UserArrangementRelationData?>> GetRelationsForUserAsync(Guid userId)
+        public async Task<IEnumerable<UserArrangementRelation?>> GetRelationsForUserAsync(long userId)
         {
             var relationsData = await _userDbContext.UserEventRelations.Where(data => data.UserId == userId).ToListAsync();
 
             return relationsData;
         }
         
-        public async Task<IEnumerable<UserArrangementRelationData?>> GetRelationsForArrangementAsync(Guid arrangementId)
+        public async Task<IEnumerable<UserArrangementRelation?>> GetRelationsForArrangementAsync(long arrangementId)
         {
             var relationsData = await _userDbContext.UserEventRelations.Where(data => data.ArrangementId == arrangementId).ToListAsync();
 
             return relationsData;
         }
 
-        public async Task AddUserEventRelationAsync(UserArrangementRelationData userArrangementRelationData)
+        public async Task AddUserEventRelationAsync(UserArrangementRelation userArrangementRelation)
         {
-            await _userDbContext.UserEventRelations.AddAsync(userArrangementRelationData);
+            await _userDbContext.UserEventRelations.AddAsync(userArrangementRelation);
 
             await _userDbContext.SaveChangesAsync();
         }

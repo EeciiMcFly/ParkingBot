@@ -35,13 +35,13 @@ public class ArrangementDialog : IDialog<BotContext>
         var innerUserId = await usersRepository.GetUserAsync(context.TelegramUserId)
             ?? throw new Exception("You do not exist");
 
-        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(innerUserId.Id);
+        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(innerUserId.UserId);
         var arrangements = await Task.WhenAll(relations.Select(x => arrangementRepository.GetArrangementAsync(x.ArrangementId)));
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
             new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.Back)}
-                .Concat(arrangements.Select(x => InlineKeyboardButton.WithCallbackData(x.Name, CallbackDataConstants.SelectArrangement + "/" + x.Id)))
+                .Concat(arrangements.Select(x => InlineKeyboardButton.WithCallbackData(x.Name, CallbackDataConstants.SelectArrangement + "/" + x.ArrangementId)))
         });
         
         var answer = new FrameState
@@ -75,7 +75,7 @@ public class ArrangementDialog : IDialog<BotContext>
 
         if (context.CallbackData.Contains(CallbackDataConstants.SelectArrangement))
         {
-            var arrangementGuid = new Guid(context.CallbackData.Split('/')[1]);
+            var arrangementGuid = Convert.ToInt64(context.CallbackData.Split('/')[1]);
             var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
             
             var ikm = new InlineKeyboardMarkup(new[]

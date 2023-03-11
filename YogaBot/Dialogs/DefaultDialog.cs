@@ -30,15 +30,14 @@ public class DefaultDialog : IDialog<BotContext>
 
         if (user == null)
         {
-            user = new UserData()
+            user = new User
             {
-                Id = Guid.NewGuid(),
                 TelegramUserId = context.TelegramUserId
             };
             await usersRepository.AddUserAsync(user);
         }
 
-        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(user.Id);
+        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(user.UserId);
         var arrangements = relations.Select(async x => await arrangementRepository.GetArrangementAsync(x.UserId)).Select(x => x.Result);
         
         var ikm = new InlineKeyboardMarkup(new[]

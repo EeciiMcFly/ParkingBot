@@ -4,9 +4,9 @@ namespace YogaBot.Storage.Arrangements
 {
     public interface IArrangementRepository
     {
-        Task<ArrangementData?> GetArrangementAsync(Guid arrangementId);
+        Task<Arrangement?> GetArrangementAsync(long arrangementId);
 
-        Task AddArrangementAsync(ArrangementData userData);
+        Task AddArrangementAsync(Arrangement user);
     }
     
     public class ArrangementRepository : IArrangementRepository
@@ -18,16 +18,16 @@ namespace YogaBot.Storage.Arrangements
             _userDbContext = userDbContext;
         }
 
-        public async Task<ArrangementData?> GetArrangementAsync(Guid arrangementId)
+        public async Task<Arrangement?> GetArrangementAsync(long arrangementId)
         {
-            var arrangementData = await _userDbContext.Arrangements.FirstOrDefaultAsync(data => data.Id == arrangementId);
+            var arrangementData = await _userDbContext.Arrangements.FirstOrDefaultAsync(data => data.ArrangementId == arrangementId);
 
             return arrangementData;
         }
 
-        public async Task AddArrangementAsync(ArrangementData arrangementData)
+        public async Task AddArrangementAsync(Arrangement arrangement)
         {
-            await _userDbContext.Arrangements.AddAsync(arrangementData);
+            await _userDbContext.Arrangements.AddAsync(arrangement);
 
             await _userDbContext.SaveChangesAsync();
         }

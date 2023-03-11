@@ -53,7 +53,7 @@ public class StorageModule : Module
             Port = 5432,
             Database = "yoga",
             Username = "postgres",
-            Password = "masterkey"
+            Password = "postgres"
         }.ToString();
         
 

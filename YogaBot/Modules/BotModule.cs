@@ -13,7 +13,7 @@ public class BotModule : Module
 
         builder.Register(c =>
             {
-                var telegramBotClient = new TelegramBotClient("6159101214:AAFbD8_eGfgnuOiFLouSPpwDlZoOEwCrRUs");
+                var telegramBotClient = new TelegramBotClient("5702939362:AAFL8LNR_S4HK_YaLTcMgtvK4yg-IBG3_0U");
 
                 return telegramBotClient;
             })

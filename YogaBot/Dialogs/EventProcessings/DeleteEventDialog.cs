@@ -54,10 +54,10 @@ public class DeleteEventDialog : IDialog<BotContext>
     private async void ProcessArrangementData(BotContext context, string callbackData)
     {
         var date = DateTime.Parse(context.MessageText).ToUniversalTime();
-        var arrangementGuid = new Guid(callbackData.Split('/')[1]);
+        var arrangementGuid = Convert.ToInt64(callbackData.Split('/')[1]);
         var events = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
         
-        await eventsRepository.DeleteEventAsync(events.FirstOrDefault(x => x.Date == date).Id);
+        await eventsRepository.DeleteEventAsync(events.FirstOrDefault(x => x.Date == date).EventId);
 
         var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
         

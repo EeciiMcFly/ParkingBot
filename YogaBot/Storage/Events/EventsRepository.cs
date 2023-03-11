@@ -4,15 +4,15 @@ namespace YogaBot.Storage.Events
 {
     public interface IEventsRepository
     {
-        Task<EventData?> GetEventAsync(Guid eventId);
+        Task<Event?> GetEventAsync(long eventId);
 
-        Task<IEnumerable<EventData?>> GetEventsForDateAsync(DateTime userId);
+        Task<IEnumerable<Event?>> GetEventsForDateAsync(DateTime userId);
         
-        Task<IEnumerable<EventData?>> GetEventsForArrangementAsync(Guid arrangementId);
+        Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId);
 
-        Task AddEventAsync(EventData eventData);
+        Task AddEventAsync(Event @event);
 
-        Task DeleteEventAsync(Guid eventId);
+        Task DeleteEventAsync(long eventId);
     }
     
     public class EventsRepository : IEventsRepository
@@ -24,37 +24,37 @@ namespace YogaBot.Storage.Events
             _userDbContext = userDbContext;
         }
 
-        public async Task<EventData?> GetEventAsync(Guid eventId)
+        public async Task<Event?> GetEventAsync(long eventId)
         {
-            var eventData = await _userDbContext.Events.FirstOrDefaultAsync(data => data.Id == eventId);
+            var eventData = await _userDbContext.Events.FirstOrDefaultAsync(data => data.EventId == eventId);
 
             return eventData;
         }
 
-        public async Task<IEnumerable<EventData?>> GetEventsForDateAsync(DateTime date)
+        public async Task<IEnumerable<Event?>> GetEventsForDateAsync(DateTime date)
         {
             var events = await _userDbContext.Events.Where(data => data.Date == date).ToListAsync();
 
             return events;
         }
         
-        public async Task<IEnumerable<EventData?>> GetEventsForArrangementAsync(Guid arrangementId)
+        public async Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId)
         {
             var events = await _userDbContext.Events.Where(data => data.ArrangementId == arrangementId).ToListAsync();
 
             return events;
         }
         
-        public async Task DeleteEventAsync(Guid eventId)
+        public async Task DeleteEventAsync(long eventId)
         {
-            var deletedEvent = await _userDbContext.Events.FirstOrDefaultAsync(data => data.Id == eventId);
+            var deletedEvent = await _userDbContext.Events.FirstOrDefaultAsync(data => data.EventId == eventId);
             var eventData = _userDbContext.Events.Remove(deletedEvent);
             await _userDbContext.SaveChangesAsync();
         }
 
-        public async Task AddEventAsync(EventData eventData)
+        public async Task AddEventAsync(Event @event)
         {
-            await _userDbContext.Events.AddAsync(eventData);
+            await _userDbContext.Events.AddAsync(@event);
 
             await _userDbContext.SaveChangesAsync();
         }

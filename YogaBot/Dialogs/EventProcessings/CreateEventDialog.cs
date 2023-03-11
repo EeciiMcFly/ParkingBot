@@ -52,10 +52,9 @@ public class CreateEventDialog : IDialog<BotContext>
     {
         var eventInfo = context.MessageText.Split("\n").Select(x => x.Trim()).ToList();
 
-        var newEvent = new EventData
+        var newEvent = new Event
         {
-            Id = Guid.NewGuid(),
-            ArrangementId = new Guid(callbackData.Split('/')[1]),
+            ArrangementId = Convert.ToInt64(callbackData.Split('/')[1]),
             Cost = Convert.ToInt32(eventInfo[2]),
             Name = eventInfo[0],
             Date = DateTime.Parse(eventInfo[1]).ToUniversalTime()
@@ -65,7 +64,7 @@ public class CreateEventDialog : IDialog<BotContext>
         
         await eventsRepository.AddEventAsync(newEvent);
         
-        var arrangementGuid = new Guid(callbackData.Split('/')[1]);
+        var arrangementGuid = Convert.ToInt64(callbackData.Split('/')[1]);
         var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
             
         var ikm = new InlineKeyboardMarkup(new[]

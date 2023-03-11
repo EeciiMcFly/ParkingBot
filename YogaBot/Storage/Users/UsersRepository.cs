@@ -4,11 +4,11 @@ namespace YogaBot.Storage.Users;
 
 public interface IUsersRepository
 {
-	Task<UserData?> GetUserAsync(long telegramUserId);
+	Task<User?> GetUserAsync(long telegramUserId);
 
-	Task AddUserAsync(UserData userData);
+	Task AddUserAsync(User user);
 
-	Task UpdateUserAsync(UserData user);
+	Task UpdateUserAsync(User user);
 }
 
 public class UsersRepository : IUsersRepository
@@ -20,21 +20,21 @@ public class UsersRepository : IUsersRepository
 		_storageDbContext = storageDbContext;
 	}
 
-	public async Task<UserData?> GetUserAsync(long telegramUserId)
+	public async Task<User?> GetUserAsync(long telegramUserId)
 	{
 		var userData = await _storageDbContext.Users.FirstOrDefaultAsync(data => data.TelegramUserId == telegramUserId);
 
 		return userData;
 	}
 
-	public async Task AddUserAsync(UserData userData)
+	public async Task AddUserAsync(User user)
 	{
-		await _storageDbContext.Users.AddAsync(userData);
+		await _storageDbContext.Users.AddAsync(user);
 
 		await _storageDbContext.SaveChangesAsync();
 	}
 
-	public async Task UpdateUserAsync(UserData user)
+	public async Task UpdateUserAsync(User user)
 	{
 		_storageDbContext.Users.Update(user);
 

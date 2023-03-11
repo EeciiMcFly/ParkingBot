@@ -43,9 +43,9 @@ public class GetEventsDialog : IDialog<BotContext>
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
             new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.SelectArrangement + "/" + arrangementGuid)},
         });
         var answer = new FrameState
         {

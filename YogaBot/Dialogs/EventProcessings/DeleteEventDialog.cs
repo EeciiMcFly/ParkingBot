@@ -59,6 +59,7 @@ public class DeleteEventDialog : IDialog<BotContext>
         
         await eventsRepository.DeleteEventAsync(events.FirstOrDefault(x => x.Date == date).EventId);
 
+        var message = "Событие успешно удалено";
         var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
         
         var events1 = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
@@ -66,16 +67,16 @@ public class DeleteEventDialog : IDialog<BotContext>
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
             new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
         });
         
         var answer = new FrameState
         {
             ChatId = context.ChatId,
             MessageType = MessageType.Send,
-            MessageText = arrangement.Name,
+            MessageText = message,
             Ikm = ikm
         };
             

@@ -39,10 +39,11 @@ public class DefaultDialog : IDialog<BotContext>
 
         var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(user.UserId);
         var arrangements = relations.Select(async x => await arrangementRepository.GetArrangementAsync(x.UserId)).Select(x => x.Result);
-        
+
+
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Мои мероприятия", CallbackDataConstants.MyActivities)}
+            new[] {InlineKeyboardButton.WithCallbackData("Мои мероприятия", CallbackDataConstants.AllActivities)}
         });
         
         var answer = new FrameState
@@ -51,13 +52,21 @@ public class DefaultDialog : IDialog<BotContext>
             MessageText = "Привет это Йога бот!",
             Ikm = ikm
         };
+        if (context.CallbackData != null)
+        {
+            answer.MessageId = context.MessageId;
+            answer.MessageType = MessageType.Change;
+        }
+
 
         outputMessageQueue.AddMessage(answer);
     }
 
     public bool CanProcess(BotContext context)
     {
-        return false;
+        if (context.CallbackData == null)
+            return false;
+        return context.CallbackData.Contains(CallbackDataConstants.Start);
     }
 
     public int Priority => 0;

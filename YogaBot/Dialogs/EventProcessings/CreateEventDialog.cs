@@ -74,20 +74,19 @@ public class CreateEventDialog : IDialog<BotContext>
             message = "Событие на данное время уже запланировано";
         }
 
-
         var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
             new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)}
+            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)},
         });
+
         var answer = new FrameState
         {
             ChatId = context.ChatId,
-            MessageId = context.MessageId,
-            MessageType = MessageType.Change,
+            MessageType = MessageType.Send,
             MessageText = message,
             Ikm = ikm
         };

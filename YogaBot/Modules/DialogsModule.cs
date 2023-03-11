@@ -1,5 +1,6 @@
 ﻿using Autofac;
 using YogaBot.Dialogs;
+using YogaBot.Dialogs.ArrangementProcessings;
 using YogaBot.Dialogs.EventProcessings;
 
 namespace YogaBot.Modules;
@@ -27,9 +28,14 @@ public class DialogsModule : Module
             .As<GetEventsDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
-        
+
         builder.RegisterType<ArrangementDialog>()
             .As<ArrangementDialog>()
+            .As<IDialog<BotContext>>()
+            .SingleInstance();
+
+        builder.RegisterType<GetArrangementsDialog>()
+            .As<GetArrangementsDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
     }

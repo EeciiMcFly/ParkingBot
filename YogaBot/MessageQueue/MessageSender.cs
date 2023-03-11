@@ -43,26 +43,36 @@ public class MessageSender : IMessageSender
                 continue;
             }
 
-            if (message.MessageType == MessageType.Send)
+            switch (message.MessageType)
             {
-                if (message.Ikm != null)
-                    await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                        replyMarkup: message.Ikm, cancellationToken: cancellationToken);
-                else
-                    await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                        cancellationToken: cancellationToken);
-            }
-            else
-            {
-                if (message.Ikm != null)
-                    await telegramBotClient.EditMessageTextAsync(message.ChatId,
-                        message.MessageId, message.MessageText, replyMarkup: message.Ikm,
-                        cancellationToken: cancellationToken);
-                else
-                {
-                    await telegramBotClient.EditMessageTextAsync(message.ChatId,
-                        message.MessageId, message.MessageText, cancellationToken: cancellationToken);
-                }
+                case MessageType.Send:
+                    if (message.Ikm != null)
+                        await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
+                            replyMarkup: message.Ikm, cancellationToken: cancellationToken);
+                    else
+                        await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
+                            cancellationToken: cancellationToken);
+                    break;
+                case MessageType.Change:
+                    if (message.Ikm != null)
+                        await telegramBotClient.EditMessageTextAsync(message.ChatId,
+                            message.MessageId, message.MessageText, replyMarkup: message.Ikm,
+                            cancellationToken: cancellationToken);
+                    else
+                    {
+                        await telegramBotClient.EditMessageTextAsync(message.ChatId,
+                            message.MessageId, message.MessageText, cancellationToken: cancellationToken);
+                    }
+
+                    break;
+                case MessageType.Poll:
+                    var pool = message.Poll;
+                    await telegramBotClient.SendPollAsync(message.ChatId, pool.Answer, pool.Options,
+                        isAnonymous: pool.IsAnonymous, allowsMultipleAnswers: pool.AllowsMultipleAnswers,
+                        closeDate: pool.CloseDate, cancellationToken: cancellationToken);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
     }

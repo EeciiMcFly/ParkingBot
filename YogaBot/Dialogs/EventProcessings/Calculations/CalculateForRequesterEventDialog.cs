@@ -36,7 +36,7 @@ public class CalculateForRequesterEventDialog : IDialog<BotContext>
 
     public void StartDialog(BotContext context)
     {
-        var message = "Введите дату начала и дату конца в формате: \n10.03.2022 \n17.03.2022";
+        var message = "Введите дату начала и дату конца в формате: \n10.03.2023 \n17.03.2023";
         var answer = new FrameState
         {
             ChatId = context.ChatId,

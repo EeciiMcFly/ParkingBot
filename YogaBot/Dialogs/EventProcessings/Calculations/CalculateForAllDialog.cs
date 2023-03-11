@@ -40,7 +40,7 @@ public class CalculateForAllDialog : IDialog<BotContext>
 
     public void StartDialog(BotContext context)
     {
-        var message = "Введите дату начала и дату конца в формате: \n10.03.2022 \n17.03.2022";
+        var message = "Введите дату начала и дату конца в формате: \n10.03.2023 \n17.03.2023";
         var answer = new FrameState
         {
             ChatId = context.ChatId,
@@ -92,10 +92,13 @@ public class CalculateForAllDialog : IDialog<BotContext>
             foreach (var @event in events)
             {
                 var presences = await presenceRepository.GetPresencesForEventAsync(@event.EventId);
-                var count = presences.Count();
-                if (count != 0)
+                if (presences.Any(e => e.UserId == visitor.UserId))
                 {
-                    sum += @event.Cost / presences.Count();
+                    var count = presences.Count();
+                    if (count != 0)
+                    {
+                        sum += @event.Cost / presences.Count();
+                    }
                 }
             }
 
@@ -116,6 +119,11 @@ public class CalculateForAllDialog : IDialog<BotContext>
         foreach (var resultString in resultStrings)
         {
             message += "\n" + resultString;
+        }
+
+        if (string.IsNullOrEmpty(message))
+        {
+            message = "В заданный период не было платных событий";
         }
 
         var resultMessage = new FrameState

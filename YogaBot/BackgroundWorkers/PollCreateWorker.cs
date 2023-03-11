@@ -33,7 +33,7 @@ public class PollCreateWorker : IHostedService
         while (!cancellationTokenSource.Token.IsCancellationRequested)
         {
             var utcNow = DateTime.UtcNow;
-            var date = new DateTime(utcNow.Year, utcNow.Month, utcNow.AddDays(1).Day, 11, 59, 0, DateTimeKind.Utc);
+            var date = new DateTime(utcNow.Year, utcNow.Month, utcNow.AddDays(1).Day, 23, 59, 0, DateTimeKind.Utc);
             using var scope = serviceProvider.CreateAsyncScope();
             var eventsRepository = scope.ServiceProvider.GetService(typeof(IEventsRepository)) as IEventsRepository;
             var events = await eventsRepository.GetEventsForDate(date);
@@ -49,6 +49,8 @@ public class PollCreateWorker : IHostedService
                     {
                         var stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine(@event.Name);
+                        var dataDate = @event.Date - (DateTime.UtcNow - DateTime.Now);
+                        stringBuilder.AppendLine(dataDate.ToString("M") + " " + dataDate.ToString("t"));
                         if (@event.Cost > 0)
                             stringBuilder.AppendLine($"Стоимость: {@event.Cost}");
                         stringBuilder.AppendLine("Идешь?");

@@ -33,9 +33,6 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
-				if (update.Message.Chat.Id < 0)
-					return;
-
 				if (update.Message.Type == MessageType.ChatMemberLeft ||
 				    update.Message.Type == MessageType.ChatMembersAdded)
 				{

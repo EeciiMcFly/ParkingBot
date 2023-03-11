@@ -28,7 +28,7 @@ public class CreateEventDialog : IDialog<BotContext>
 
     public void StartDialog(BotContext context)
     {
-        var message = "Введите название события, дату и стоимость в формате: \nЙога \n10.03.2022 15:00\n1500";
+        var message = "Введите название события, дату и стоимость в формате: \nЙога \n10.03.2023 15:00\n1500";
         var answer = new FrameState
         {
             ChatId = context.ChatId,

@@ -3,7 +3,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using YogaBot.MessageQueue;
-using YogaBot.MessagesProcessors;
+using YogaBot.Models.ChatMember;
 
 namespace YogaBot;
 
@@ -14,16 +14,18 @@ public class Worker : IHostedService
 	private readonly IInputMessageQueue inputMessageQueue;
 	private readonly IMessageSender messageSender;
 	private readonly IMessageQueueProcessor messagesProcessor;
+	private readonly IChatMemberProcessor chatMemberProcessor;
 
 	public Worker(TelegramBotClient telegramBotClient, IServiceProvider serviceProvider,
 		IInputMessageQueue inputMessageQueue, IMessageSender messageSender,
-		IMessageQueueProcessor messagesProcessor)
+		IMessageQueueProcessor messagesProcessor, IChatMemberProcessor chatMemberProcessor)
 	{
 		this.serviceProvider = serviceProvider;
 		this.telegramBotClient = telegramBotClient;
 		this.inputMessageQueue = inputMessageQueue;
 		this.messageSender = messageSender;
 		this.messagesProcessor = messagesProcessor;
+		this.chatMemberProcessor = chatMemberProcessor;
 	}
 
 	private async Task HandleMessage(ITelegramBotClient telegramBotClient, Update update, CancellationToken arg3)
@@ -32,6 +34,13 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
+				if (update.Message.Type == MessageType.ChatMemberLeft ||
+				    update.Message.Type == MessageType.ChatMembersAdded)
+				{
+					chatMemberProcessor.ProcessChatMember(update);
+					return;
+				}
+
 				var messageContext = new BotContext
 				{
 					ChatId = update.Message.Chat.Id,
@@ -55,6 +64,11 @@ public class Worker : IHostedService
 				};
 				
 				inputMessageQueue.AddMessage(messageContext);
+			}
+
+			if (update.Type == UpdateType.MyChatMember)
+			{
+				chatMemberProcessor.ProcessChat(update);
 			}
 		}
 		catch (Exception e)

@@ -17,7 +17,7 @@ public interface IChatMemberProcessor
 
 public class ChatMemberProcessor : IChatMemberProcessor
 {
-    private readonly long currentBotId = 5702939362;
+    public static long CurrentBotId { get; set; }
     private readonly IArrangementRepository arrangementRepository;
     private readonly IUsersRepository usersRepository;
     private readonly IUserArrangementRelationsRepository userArrangementRelationsRepository;
@@ -41,7 +41,7 @@ public class ChatMemberProcessor : IChatMemberProcessor
     {
         var updateMyChatMember = update.MyChatMember;
         var newChatMember = updateMyChatMember.NewChatMember;
-        if (newChatMember.User.Id != currentBotId)
+        if (newChatMember.User.Id != CurrentBotId)
             return;
 
         switch (newChatMember.Status)

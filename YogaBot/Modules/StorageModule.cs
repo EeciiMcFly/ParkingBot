@@ -46,19 +46,10 @@ public class StorageModule : Module
     private StorageDbContext GetDbContext(IComponentContext context)
     {
         var configuration = context.Resolve<IConfiguration>();
-        //var connectionString = configuration.GetConnectionString("DatabaseConnectionTemplateWithoutDbName");
-        var configurationString = new NpgsqlConnectionStringBuilder()
-        {
-            Host = "localhost",
-            Port = 5432,
-            Database = "yoga",
-            Username = "postgres",
-            Password = "postgres"
-        }.ToString();
-        
+        var connectionString = configuration.GetConnectionString("DatabaseConnectionTemplateWithoutDbName");
 
         var optionsBuilder = new DbContextOptionsBuilder<StorageDbContext>();
-        optionsBuilder.UseNpgsql(configurationString);
+        optionsBuilder.UseNpgsql(connectionString);
 
         return new StorageDbContext(optionsBuilder.Options);
     }

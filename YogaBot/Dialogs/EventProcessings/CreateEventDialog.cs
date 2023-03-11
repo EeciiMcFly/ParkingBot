@@ -3,6 +3,7 @@ using YogaBot.Constants;
 using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
+using YogaBot.Models.KeyboardBuilder;
 using YogaBot.Storage.Events;
 
 namespace YogaBot.Dialogs.EventProcessings;
@@ -12,14 +13,17 @@ public class CreateEventDialog : IDialog<BotContext>
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
     private readonly IEventsRepository eventsRepository;
+    private readonly IKeyboardBuilder keyboardBuilder;
 
     public CreateEventDialog(IOutputMessageQueue outputMessageQueue,
         IDialogStateSetter dialogStateSetter,
-        IEventsRepository eventsRepository)
+        IEventsRepository eventsRepository,
+        IKeyboardBuilder keyboardBuilder)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
         this.eventsRepository = eventsRepository;
+        this.keyboardBuilder = keyboardBuilder;
     }
 
     public void StartDialog(BotContext context)
@@ -72,31 +76,14 @@ public class CreateEventDialog : IDialog<BotContext>
             message = "Событие на данное время уже запланировано";
         }
 
-        var ikm = new InlineKeyboardMarkup(new[]
-        {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Удалить занятие",
-                    CallbackDataConstants.DeleteEvent + '/' + arrangementId)
-            },
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия",
-                    CallbackDataConstants.GetEvents + '/' + arrangementId)
-            },
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Рассчитать стоимость",
-                    CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementId)
-            },
-            new[] { InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities) }
-        });
+        var ikm = await keyboardBuilder.BuildForArrangementFrameAsync(context, arrangementId);
+
         var answer = new FrameState
         {
             ChatId = context.ChatId,
             MessageType = MessageType.Send,
             MessageText = message,
-            Ikm = ikm
+            Ikm = ikm.ToArray()
         };
 
         outputMessageQueue.AddMessage(answer);

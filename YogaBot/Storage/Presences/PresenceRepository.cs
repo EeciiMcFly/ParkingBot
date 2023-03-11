@@ -32,7 +32,7 @@ namespace YogaBot.Storage.Presences
         
         public async Task<IEnumerable<Presence?>> GetPresencesForEventAsync(long eventId)
         {
-            var relationsData = await _userDbContext.Presences.Where(data => data.EventId == eventId).ToListAsync();
+            var relationsData = await _userDbContext.Presences.Include(e => e.User).Include(e => e.Event).Where(data => data.EventId == eventId).ToListAsync();
 
             return relationsData;
         }

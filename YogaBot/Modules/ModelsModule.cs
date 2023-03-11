@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using YogaBot.Models.ChatMember;
 using YogaBot.Models.InfoProvider;
+using YogaBot.Models.KeyboardBuilder;
 using YogaBot.Models.Poll;
 
 namespace YogaBot.Modules;
@@ -18,7 +19,11 @@ public class ModelsModule : Module
             .InstancePerLifetimeScope();
 
         builder.RegisterType<InfoProvider>()
-            .As<InfoProvider>()
-            .SingleInstance();
+            .As<IInfoProvider>()
+            .InstancePerLifetimeScope();
+        
+        builder.RegisterType<KeyboardBuilder>()
+            .As<IKeyboardBuilder>()
+            .InstancePerLifetimeScope();
     }
 }

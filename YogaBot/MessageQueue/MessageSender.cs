@@ -1,5 +1,6 @@
-﻿using YogaBot.Frames;
-using Telegram.Bot;
+﻿using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
+using MessageType = YogaBot.Frames.MessageType;
 
 namespace YogaBot.MessageQueue;
 
@@ -48,20 +49,20 @@ public class MessageSender : IMessageSender
                 case MessageType.Send:
                     if (message.Ikm != null)
                         await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                            replyMarkup: message.Ikm, cancellationToken: cancellationToken);
+                            replyMarkup: message.Ikm, cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
                     else
                         await telegramBotClient.SendTextMessageAsync(message.ChatId, message.MessageText,
-                            cancellationToken: cancellationToken);
+                            cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
                     break;
                 case MessageType.Change:
                     if (message.Ikm != null)
                         await telegramBotClient.EditMessageTextAsync(message.ChatId,
                             message.MessageId, message.MessageText, replyMarkup: message.Ikm,
-                            cancellationToken: cancellationToken);
+                            cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
                     else
                     {
                         await telegramBotClient.EditMessageTextAsync(message.ChatId,
-                            message.MessageId, message.MessageText, cancellationToken: cancellationToken);
+                            message.MessageId, message.MessageText, cancellationToken: cancellationToken, parseMode: ParseMode.Markdown);
                     }
 
                     break;

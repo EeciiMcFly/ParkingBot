@@ -4,6 +4,7 @@ using YogaBot.Constants;
 using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
+using YogaBot.Models.KeyboardBuilder;
 using YogaBot.Storage.Arrangements;
 using YogaBot.Storage.Events;
 using YogaBot.Storage.Presences;
@@ -19,9 +20,10 @@ public class CalculateForRequesterEventDialog : IDialog<BotContext>
     private readonly IArrangementRepository arrangementRepository;
     private readonly IUsersRepository usersRepository;
     private readonly IPresenceRepository presenceRepository;
+    private readonly IKeyboardBuilder keyboardBuilder;
 
     public CalculateForRequesterEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
-        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository, IUsersRepository usersRepository, IPresenceRepository presenceRepository)
+        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository, IUsersRepository usersRepository, IPresenceRepository presenceRepository, IKeyboardBuilder keyboardBuilder)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
@@ -29,6 +31,7 @@ public class CalculateForRequesterEventDialog : IDialog<BotContext>
         this.arrangementRepository = arrangementRepository;
         this.usersRepository = usersRepository;
         this.presenceRepository = presenceRepository;
+        this.keyboardBuilder = keyboardBuilder;
     }
 
     public void StartDialog(BotContext context)
@@ -80,20 +83,14 @@ public class CalculateForRequesterEventDialog : IDialog<BotContext>
             return (double)x.Cost / presencesCount;
         }));
 
-        var ikm = new InlineKeyboardMarkup(new[]
-        {
-            new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
-        });
-        
+        var ikm = await keyboardBuilder.BuildForArrangementFrameAsync(context, arrangementGuid);
+
         var answer = new FrameState
         {
             ChatId = context.ChatId,
             MessageType = MessageType.Send,
             MessageText = Math.Round(costs.Sum(), 2).ToString(CultureInfo.InvariantCulture),
-            Ikm = ikm
+            Ikm = ikm.ToArray()
         };
             
         outputMessageQueue.AddMessage(answer);

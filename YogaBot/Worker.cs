@@ -45,6 +45,9 @@ public class Worker : IHostedService
 					return;
 				}
 
+				if (update.Message.Chat.Id < 0)
+					return;
+
 				var messageContext = new BotContext
 				{
 					ChatId = update.Message.Chat.Id,

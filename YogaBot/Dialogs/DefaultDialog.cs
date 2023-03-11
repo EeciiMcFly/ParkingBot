@@ -45,11 +45,21 @@ public class DefaultDialog : IDialog<BotContext>
         {
             new[] {InlineKeyboardButton.WithCallbackData("Мои мероприятия", CallbackDataConstants.AllActivities)}
         });
-        
+
+        var messageText = @"Привет, это Йога-Бот!
+Я помогу тебе с организацией групповых занятий в офисе. 
+С моей помощью ты сможешь:
+ - Вести расписание занятий
+ - Отмечать явку участников
+ - Проводить опросы среди участников
+ - Рассчитывать стоимость занятий для каждого из участников
+
+Выбери мероприятие, с которым хочешь вести работу сейчас";
+
         var answer = new FrameState
         {
             ChatId = context.ChatId,
-            MessageText = "Привет это Йога бот!",
+            MessageText = messageText,
             Ikm = ikm
         };
         if (context.CallbackData != null)

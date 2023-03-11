@@ -1,7 +1,6 @@
 ﻿using System.Text;
 using Telegram.Bot;
 using YogaBot.Frames;
-using YogaBot.MessageQueue;
 using YogaBot.Models.Poll;
 using YogaBot.Storage.Events;
 
@@ -9,14 +8,12 @@ namespace YogaBot.BackgroundWorkers;
 
 public class PollCreateWorker : IHostedService
 {
-    private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IServiceProvider serviceProvider;
     private readonly TelegramBotClient telegramBotClient;
     private CancellationTokenSource cancellationTokenSource = new();
 
-    public PollCreateWorker(IOutputMessageQueue outputMessageQueue, IServiceProvider serviceProvider, TelegramBotClient telegramBotClient)
+    public PollCreateWorker(IServiceProvider serviceProvider, TelegramBotClient telegramBotClient)
     {
-        this.outputMessageQueue = outputMessageQueue;
         this.serviceProvider = serviceProvider;
         this.telegramBotClient = telegramBotClient;
     }
@@ -48,7 +45,7 @@ public class PollCreateWorker : IHostedService
                     if (@event.PollSend)
                         continue;
 
-                    if (@event.Date.Subtract(DateTime.UtcNow).Duration() < TimeSpan.FromMinutes(5))
+                    if (@event.Date.Subtract(DateTime.UtcNow.AddDays(1)).Duration() < TimeSpan.FromMinutes(5))
                     {
                         var stringBuilder = new StringBuilder();
                         stringBuilder.AppendLine(@event.Name);

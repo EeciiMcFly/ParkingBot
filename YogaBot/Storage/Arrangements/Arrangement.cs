@@ -1,8 +1,8 @@
 ﻿namespace YogaBot.Storage.Arrangements
 {
-    public class ArrangementData
+    public class Arrangement
     {
-        public long Id { get; set; }
+        public long ArrangementId { get; set; }
 
         public string Name { get; set; }
 

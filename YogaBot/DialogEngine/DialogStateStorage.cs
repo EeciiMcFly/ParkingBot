@@ -30,6 +30,7 @@ public class DialogStateStorage : IDialogStateStorage, IDialogStateSetter
     public Action<BotContext>? GetUserState(long userId)
     {
         storage.TryGetValue(userId, out var action);
+        ClearState(userId);
         return action;
     }
 }

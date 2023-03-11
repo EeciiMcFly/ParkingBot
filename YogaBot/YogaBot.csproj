@@ -26,4 +26,8 @@
     <PackageReference Include="Telegram.Bot" Version="19.0.0-preview.2" />
     <PackageReference Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Migrations" />
+  </ItemGroup>
 </Project>

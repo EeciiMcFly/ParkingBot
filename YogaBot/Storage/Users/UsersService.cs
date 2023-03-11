@@ -2,9 +2,9 @@
 
 public interface IUsersService
 {
-	Task<UserData> GetOrCreateUserAsync(long telegramUserId);
+	Task<User> GetOrCreateUserAsync(long telegramUserId);
 
-	Task UpdateUserAsync(UserData user);
+	Task UpdateUserAsync(User user);
 }
 
 public class UsersService : IUsersService
@@ -16,17 +16,17 @@ public class UsersService : IUsersService
 		_usersRepository = usersRepository;
 	}
 
-	public async Task<UserData> GetOrCreateUserAsync(long telegramUserId)
+	public async Task<User> GetOrCreateUserAsync(long telegramUserId)
 	{
 		var user = await _usersRepository.GetUserAsync(telegramUserId);
 		if (user == null)
 		{
-			var newUserData = new UserData
+			var newUserData = new User
 			{
 				TelegramUserId = telegramUserId,
 			};
 
-			await _usersRepository.AddNewUserAsync(newUserData);
+			await _usersRepository.AddUserAsync(newUserData);
 
 			var createdUser = await _usersRepository.GetUserAsync(telegramUserId);
 
@@ -37,8 +37,8 @@ public class UsersService : IUsersService
 		return user;
 	}
 
-	public async Task UpdateUserAsync(UserData userData)
+	public async Task UpdateUserAsync(User user)
 	{
-		await _usersRepository.UpdateUserAsync(userData);
+		await _usersRepository.UpdateUserAsync(user);
 	}
 }

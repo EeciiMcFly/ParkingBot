@@ -12,6 +12,7 @@ builder.UseServiceProviderFactory(new AutofacServiceProviderFactory(containerBui
 	containerBuilder.RegisterModule<DialogsModule>();
 	containerBuilder.RegisterModule<MessageProcessorsModules>();
 	containerBuilder.RegisterModule<QueueModule>();
+	containerBuilder.RegisterModule<StorageModule>();
 }));
 
 IHost host = builder

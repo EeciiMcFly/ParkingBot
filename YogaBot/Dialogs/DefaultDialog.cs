@@ -2,28 +2,49 @@
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
 using Telegram.Bot.Types.ReplyMarkups;
+using YogaBot.Storage.Arrangements;
+using YogaBot.Storage.UserArrangementRelations;
+using YogaBot.Storage.Users;
 
 namespace YogaBot.Dialogs;
 
 public class DefaultDialog : IDialog<BotContext>
 {
     private readonly IOutputMessageQueue outputMessageQueue;
+    private readonly IUsersRepository usersRepository;
+    private readonly IArrangementRepository arrangementRepository;
+    private readonly IUserArrangementRelationsRepository userArrangementRelationsRepository;
 
-    public DefaultDialog(IOutputMessageQueue outputMessageQueue)
+    public DefaultDialog(IOutputMessageQueue outputMessageQueue, IUsersRepository usersRepository, 
+        IArrangementRepository arrangementRepository, IUserArrangementRelationsRepository userArrangementRelationsRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
+        this.usersRepository = usersRepository;
+        this.arrangementRepository = arrangementRepository;
+        this.userArrangementRelationsRepository = userArrangementRelationsRepository;
     }
 
-
-    public void StartDialog(BotContext context)
+    public async void StartDialog(BotContext context)
     {
+        var user = await usersRepository.GetUserAsync(context.TelegramUserId);
+
+        if (user == null)
+        {
+            user = new User
+            {
+                TelegramUserId = context.TelegramUserId
+            };
+            await usersRepository.AddUserAsync(user);
+        }
+
+        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(user.UserId);
+        var arrangements = relations.Select(async x => await arrangementRepository.GetArrangementAsync(x.UserId)).Select(x => x.Result);
+        
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Мои мероприятия", CallbackDataConstants.MyActivities),
-            },
+            new[] {InlineKeyboardButton.WithCallbackData("Мои мероприятия", CallbackDataConstants.MyActivities)}
         });
+        
         var answer = new FrameState
         {
             ChatId = context.ChatId,

@@ -77,16 +77,14 @@ public class ArrangementDialog : IDialog<BotContext>
         {
             var arrangementGuid = Convert.ToInt64(context.CallbackData.Split('/')[1]);
             var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
-            
+
             var ikm = new InlineKeyboardMarkup(new[]
             {
-                new[]
-                {
-                    InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid),
-                    InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid),
-                    InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid),
-                },
+                new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
+                new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
+                new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
             });
+            
             var answer = new FrameState
             {
                 ChatId = context.ChatId,

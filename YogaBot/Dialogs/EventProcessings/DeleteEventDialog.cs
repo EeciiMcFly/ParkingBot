@@ -63,21 +63,18 @@ public class DeleteEventDialog : IDialog<BotContext>
         
         var events1 = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
         var grtg = events1.Where(x => x.Date == date).ToList();
-            
+
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities),
-                InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid),
-                InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid),
-            },
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
+            new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
         });
+        
         var answer = new FrameState
         {
             ChatId = context.ChatId,
-            MessageId = context.MessageId,
-            MessageType = MessageType.Change,
+            MessageType = MessageType.Send,
             MessageText = arrangement.Name,
             Ikm = ikm
         };

@@ -6,8 +6,6 @@ namespace YogaBot.Storage.Events
     {
         Task<Event?> GetEventAsync(long eventId);
 
-        Task<IEnumerable<Event?>> GetEventsForDateAsync(DateTime userId);
-        
         Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId);
 
         Task AddEventAsync(Event @event);
@@ -31,13 +29,6 @@ namespace YogaBot.Storage.Events
             return eventData;
         }
 
-        public async Task<IEnumerable<Event?>> GetEventsForDateAsync(DateTime date)
-        {
-            var events = await _userDbContext.Events.Where(data => data.Date == date).ToListAsync();
-
-            return events;
-        }
-        
         public async Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId)
         {
             var events = await _userDbContext.Events.Where(data => data.ArrangementId == arrangementId).ToListAsync();

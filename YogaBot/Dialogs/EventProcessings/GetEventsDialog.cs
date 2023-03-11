@@ -40,15 +40,12 @@ public class GetEventsDialog : IDialog<BotContext>
         {
             message = "Занятий не найдено";
         }
-            
+
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities),
-                InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid),
-                InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid),
-            },
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
+            new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
         });
         var answer = new FrameState
         {

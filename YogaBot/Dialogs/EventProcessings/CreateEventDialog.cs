@@ -51,37 +51,44 @@ public class CreateEventDialog : IDialog<BotContext>
     private async void ProcessArrangementData(BotContext context, string callbackData)
     {
         var eventInfo = context.MessageText.Split("\n").Select(x => x.Trim()).ToList();
+        var date = DateTime.Parse(eventInfo[1]).ToUniversalTime();
+        var message = string.Empty;
+        var arrangementGuid = Int64.Parse(callbackData.Split('/')[1]);
+        
+        var arrangementEvents = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
 
-        var newEvent = new Event
+        if (arrangementEvents.FirstOrDefault(x => x.Date == date) == null)
         {
-            ArrangementId = Convert.ToInt64(callbackData.Split('/')[1]),
-            Cost = Convert.ToInt32(eventInfo[2]),
-            Name = eventInfo[0],
-            Date = DateTime.Parse(eventInfo[1]).ToUniversalTime()
-        };
-        
-        var currentEvent = (await eventsRepository.GetEventsForDateAsync(DateTime.Parse(eventInfo[1]).ToUniversalTime())).ToList();
-        
-        await eventsRepository.AddEventAsync(newEvent);
-        
-        var arrangementGuid = Convert.ToInt64(callbackData.Split('/')[1]);
+            var newEvent = new Event
+            {
+                ArrangementId = Convert.ToInt64(callbackData.Split('/')[1]),
+                Cost = Convert.ToInt32(eventInfo[2]),
+                Name = eventInfo[0],
+                Date = DateTime.Parse(eventInfo[1]).ToUniversalTime()
+            };
+            await eventsRepository.AddEventAsync(newEvent);
+            message = "Событие успешно добавлено";
+        }
+        else
+        {
+            message = "Событие на данное время уже запланировано";
+        }
+
+
         var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
-            
+
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[]
-            {
-                InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities),
-                InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid),
-                InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid),
-            },
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.MyActivities)},
+            new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)}
         });
-        
         var answer = new FrameState
         {
             ChatId = context.ChatId,
-            MessageType = MessageType.Send,
-            MessageText = arrangement.Name,
+            MessageId = context.MessageId,
+            MessageType = MessageType.Change,
+            MessageText = message,
             Ikm = ikm
         };
             

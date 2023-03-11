@@ -4,6 +4,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using YogaBot.MessageQueue;
 using YogaBot.Models.ChatMember;
+using YogaBot.Models.Poll;
 
 namespace YogaBot;
 
@@ -32,6 +33,9 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
+				if (update.Message.Chat.Id < 0)
+					return;
+
 				if (update.Message.Type == MessageType.ChatMemberLeft ||
 				    update.Message.Type == MessageType.ChatMembersAdded)
 				{
@@ -40,6 +44,9 @@ public class Worker : IHostedService
 					chatMemberProcessor.ProcessChatMember(update);
 					return;
 				}
+
+				if (update.Message.Chat.Id < 0)
+					return;
 
 				var messageContext = new BotContext
 				{
@@ -71,6 +78,13 @@ public class Worker : IHostedService
 				using var scope = serviceProvider.CreateAsyncScope();
 				var chatMemberProcessor = scope.ServiceProvider.GetService(typeof(IChatMemberProcessor)) as IChatMemberProcessor;
 				chatMemberProcessor.ProcessChatAsync(update);
+			}
+
+			if (update.Type == UpdateType.PollAnswer)
+			{
+				using var scope = serviceProvider.CreateAsyncScope();
+				var pollAnswerProcessor = scope.ServiceProvider.GetService(typeof(IPollAnswerProcessor)) as IPollAnswerProcessor;
+				pollAnswerProcessor.ProcessAnswer(update);
 			}
 		}
 		catch (Exception e)

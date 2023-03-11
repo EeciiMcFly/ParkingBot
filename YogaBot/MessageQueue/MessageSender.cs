@@ -68,8 +68,7 @@ public class MessageSender : IMessageSender
                 case MessageType.Poll:
                     var pool = message.Poll;
                     await telegramBotClient.SendPollAsync(message.ChatId, pool.Answer, pool.Options,
-                        isAnonymous: pool.IsAnonymous, allowsMultipleAnswers: pool.AllowsMultipleAnswers,
-                        closeDate: pool.CloseDate, cancellationToken: cancellationToken);
+                        isAnonymous: pool.IsAnonymous, allowsMultipleAnswers: pool.AllowsMultipleAnswers, cancellationToken: cancellationToken);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

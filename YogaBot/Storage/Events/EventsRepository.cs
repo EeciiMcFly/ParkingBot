@@ -6,6 +6,10 @@ namespace YogaBot.Storage.Events
     {
         Task<Event?> GetEventAsync(long eventId);
 
+        Task<Event?> GetEventByPollIdAsync(string pollId);
+
+        Task<List<Event>> GetEventsForDate(DateTime dateTime);
+
         Task<IEnumerable<Event?>> GetEventsForArrangementAsync(long arrangementId);
 
         Task<IEnumerable<Event?>> GetEventsForPeriodAndArrangementAsync(DateTime start, DateTime end, long arrangementId);
@@ -17,6 +21,8 @@ namespace YogaBot.Storage.Events
         Task DeleteEventAsync(Event @event);
 
         Task DeleteEventForArrangementAsync(long arrangementId);
+
+        Task UpdateAsync(Event @event);
     }
     
     public class EventsRepository : IEventsRepository
@@ -33,6 +39,20 @@ namespace YogaBot.Storage.Events
             var eventData = await _userDbContext.Events.FirstOrDefaultAsync(data => data.EventId == eventId);
 
             return eventData;
+        }
+
+        public async Task<Event?> GetEventByPollIdAsync(string pollId)
+        {
+            var eventData = await _userDbContext.Events.Include(e => e.Arrangement).FirstOrDefaultAsync(data => data.PollId == pollId);
+
+            return eventData;
+        }
+
+        public async Task<List<Event>> GetEventsForDate(DateTime dateTime)
+        {
+            var events = await _userDbContext.Events.Include(e => e.Arrangement).Where(data => data.Date < dateTime).ToListAsync();
+
+            return events;
         }
 
         public async Task<IEnumerable<Event?>> GetEventsForPeriodAndArrangementAsync(DateTime start, DateTime end, long arrangementId)
@@ -66,6 +86,12 @@ namespace YogaBot.Storage.Events
         {
             var events = await _userDbContext.Events.Where(data => data.ArrangementId == arrangementId).ToListAsync();
             _userDbContext.RemoveRange(events);
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task UpdateAsync(Event @event)
+        {
+            _userDbContext.Update(@event);
             await _userDbContext.SaveChangesAsync();
         }
 

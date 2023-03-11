@@ -57,6 +57,14 @@ public class ChatMemberProcessor : IChatMemberProcessor
 
                 var createdArrangement = await arrangementRepository.AddArrangementAsync(newArrangement);
                 var userAdmin = await usersRepository.GetUserAsync(updateMyChatMember.From.Id);
+                if (userAdmin == null)
+                {
+                    var newUser = new User
+                    {
+                        TelegramUserId = updateMyChatMember.From.Id,
+                    };
+                    userAdmin = await usersRepository.AddUserAsync(newUser);
+                }
                 var newUserArrangementRelation = new UserArrangementRelation
                 {
                     ArrangementId = createdArrangement.ArrangementId,

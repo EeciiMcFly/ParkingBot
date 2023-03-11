@@ -1,27 +1,29 @@
 ﻿using Telegram.Bot.Types.ReplyMarkups;
 using YogaBot.Constants;
-using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
-using YogaBot.Storage.Arrangements;
 using YogaBot.Storage.Events;
+using YogaBot.Storage.UserArrangementRelations;
+using YogaBot.Storage.Users;
 
 namespace YogaBot.Dialogs.EventProcessings;
 
 public class GetEventsDialog : IDialog<BotContext>
 {
     private readonly IOutputMessageQueue outputMessageQueue;
-    private readonly IDialogStateSetter dialogStateSetter;
     private readonly IEventsRepository eventsRepository;
-    private readonly IArrangementRepository arrangementRepository;
+    private readonly IUsersRepository usersRepository;
+    private readonly IUserArrangementRelationsRepository userArrangementRelationsRepository;
 
-    public GetEventsDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
-        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository)
+    public GetEventsDialog(IOutputMessageQueue outputMessageQueue,
+        IEventsRepository eventsRepository,
+        IUsersRepository usersRepository,
+        IUserArrangementRelationsRepository userArrangementRelationsRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
-        this.dialogStateSetter = dialogStateSetter;
         this.eventsRepository = eventsRepository;
-        this.arrangementRepository = arrangementRepository;
+        this.usersRepository = usersRepository;
+        this.userArrangementRelationsRepository = userArrangementRelationsRepository;
     }
 
     public async void StartDialog(BotContext context)
@@ -30,6 +32,23 @@ public class GetEventsDialog : IDialog<BotContext>
 
         var events = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
         var message = string.Empty;
+        var user = await usersRepository.GetUserAsync(context.TelegramUserId);
+        var relationsForUser = await userArrangementRelationsRepository.GetRelationsForUserAsync(user.UserId);
+        var role = relationsForUser.FirstOrDefault(e => e.ArrangementId == arrangementGuid)?.Role;
+
+        var ikm = new List<InlineKeyboardButton[]>();
+        ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия",
+            CallbackDataConstants.GetEvents + '/' + arrangementGuid)});
+        if (role == Role.Admin || role == Role.Trainer)
+        {
+            ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Запланировать занятие",
+                CallbackDataConstants.CreateEvent + '/' + arrangementGuid)});
+            ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Удалить занятие",
+                CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)});
+        }
+        ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Сколько я должен?", 
+            CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)});
+        ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)});
 
         foreach (var eventData in events)
         {
@@ -41,20 +60,13 @@ public class GetEventsDialog : IDialog<BotContext>
             message = "Занятий не найдено";
         }
 
-        var ikm = new InlineKeyboardMarkup(new[]
-        {
-            new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
-        });
         var answer = new FrameState
         {
             ChatId = context.ChatId,
             MessageId = context.MessageId,
             MessageType = MessageType.Change,
             MessageText = message,
-            Ikm = ikm
+            Ikm = ikm.ToArray()
         };
             
         outputMessageQueue.AddMessage(answer);

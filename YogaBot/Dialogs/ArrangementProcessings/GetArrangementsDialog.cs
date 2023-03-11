@@ -28,15 +28,24 @@ public class GetArrangementsDialog : IDialog<BotContext>
 
     public async void StartDialog(BotContext context)
     {
-        /*var eventCount = 1;
-        var ggg = eventCount > 6 ? ConstructPluralFindParkingFrame() : ConstructSingleFindParkingFrame();*/
-
         var innerUserId = await usersRepository.GetUserAsync(context.TelegramUserId)
                           ?? throw new Exception("You do not exist");
 
         var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(innerUserId.UserId);
         var arrangements =
             await Task.WhenAll(relations.Select(x => arrangementRepository.GetArrangementAsync(x.ArrangementId)));
+
+        var message = "";
+        if (!arrangements.Any())
+        {
+            message = @"Сейчас у вас нет действующих мероприятий.
+Чтобы начать работу - создай группу для мероприятия.
+Сначала добавь в неё меня в качестве администратора, а уже затем участников!";
+        }
+        else
+        {
+            message = "Выберете мероприятие:";
+        }
 
         var ikm = arrangements.Select(x =>
                 InlineKeyboardButton.WithCallbackData(x.Name,
@@ -49,7 +58,7 @@ public class GetArrangementsDialog : IDialog<BotContext>
             ChatId = context.ChatId,
             MessageId = context.MessageId,
             MessageType = MessageType.Change,
-            MessageText = "Тут твои мероприятия",
+            MessageText = message,
             Ikm = ikm.ToArray()
         };
 

@@ -3,7 +3,6 @@ using YogaBot.Constants;
 using YogaBot.DialogEngine;
 using YogaBot.Frames;
 using YogaBot.MessageQueue;
-using YogaBot.Storage.Arrangements;
 using YogaBot.Storage.Events;
 
 namespace YogaBot.Dialogs.EventProcessings;
@@ -13,15 +12,14 @@ public class CreateEventDialog : IDialog<BotContext>
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
     private readonly IEventsRepository eventsRepository;
-    private readonly IArrangementRepository arrangementRepository;
 
-    public CreateEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
-        IEventsRepository eventsRepository, IArrangementRepository arrangementRepository)
+    public CreateEventDialog(IOutputMessageQueue outputMessageQueue,
+        IDialogStateSetter dialogStateSetter,
+        IEventsRepository eventsRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
         this.eventsRepository = eventsRepository;
-        this.arrangementRepository = arrangementRepository;
     }
 
     public void StartDialog(BotContext context)
@@ -42,7 +40,7 @@ public class CreateEventDialog : IDialog<BotContext>
     {
         if (context.CallbackData == null)
             return false;
-            
+
         return context.CallbackData.Contains(CallbackDataConstants.CreateEvent);
     }
 
@@ -53,16 +51,16 @@ public class CreateEventDialog : IDialog<BotContext>
         var eventInfo = context.MessageText.Split("\n").Select(x => x.Trim()).ToList();
         var date = DateTime.Parse(eventInfo[1]).ToUniversalTime();
         var message = string.Empty;
-        var arrangementGuid = Int64.Parse(callbackData.Split('/')[1]);
-        
-        var arrangementEvents = await eventsRepository.GetEventsForArrangementAsync(arrangementGuid);
+        var arrangementId = Int64.Parse(callbackData.Split('/')[1]);
+
+        var arrangementEvents = await eventsRepository.GetEventsForArrangementAsync(arrangementId);
 
         if (arrangementEvents.FirstOrDefault(x => x.Date == date) == null)
         {
             var newEvent = new Event
             {
                 ArrangementId = Convert.ToInt64(callbackData.Split('/')[1]),
-                Cost = Convert.ToInt32(eventInfo[2]),
+                Cost = Convert.ToInt32(eventInfo[2].Replace(" ", "")),
                 Name = eventInfo[0],
                 Date = DateTime.Parse(eventInfo[1]).ToUniversalTime()
             };
@@ -74,14 +72,24 @@ public class CreateEventDialog : IDialog<BotContext>
             message = "Событие на данное время уже запланировано";
         }
 
-        var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
-
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            new[] {InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Удалить занятие",
+                    CallbackDataConstants.DeleteEvent + '/' + arrangementId)
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия",
+                    CallbackDataConstants.GetEvents + '/' + arrangementId)
+            },
+            new[]
+            {
+                InlineKeyboardButton.WithCallbackData("Рассчитать стоимость",
+                    CallbackDataConstants.CalculatePrice + '/' + arrangementId)
+            },
+            new[] { InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities) }
         });
         var answer = new FrameState
         {
@@ -90,7 +98,7 @@ public class CreateEventDialog : IDialog<BotContext>
             MessageText = message,
             Ikm = ikm
         };
-            
+
         outputMessageQueue.AddMessage(answer);
     }
 }

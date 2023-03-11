@@ -14,11 +14,20 @@ public class StorageModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        Register<UsersRepository, IUsersRepository>(builder, (c) => new UsersRepository(c));
-        Register<ArrangementRepository, IArrangementRepository>(builder, (c) => new ArrangementRepository(c));
-        Register<EventsRepository, IEventsRepository>(builder, (c) => new EventsRepository(c));
-        Register<UserArrangementRelationsRepository, IUserEventRelationsRepository>(builder, (c) => new UserArrangementRelationsRepository(c));
-        Register<PresenceRepository, IPresenceRepository>(builder, (c) => new PresenceRepository(c));
+        Register<UsersRepository, IUsersRepository>(builder, 
+            (c) => new UsersRepository(c));
+        
+        Register<ArrangementRepository, IArrangementRepository>(builder, 
+            (c) => new ArrangementRepository(c));
+        
+        Register<EventsRepository, IEventsRepository>(builder, 
+            (c) => new EventsRepository(c));
+        
+        Register<UserArrangementRelationsRepository, IUserArrangementRelationsRepository>(builder, 
+            (c) => new UserArrangementRelationsRepository(c));
+        
+        Register<PresenceRepository, IPresenceRepository>(builder, 
+            (c) => new PresenceRepository(c));
     }
 
     private void Register<TImpl, TAbs>(ContainerBuilder builder, Func<StorageDbContext, TImpl> createImpl) 

@@ -30,7 +30,7 @@ namespace YogaBot.Storage
         {
             if (!options.IsConfigured)
             {
-                options.UseNpgsql("Host=localhost; Port=5432;Database=postgres;Username=yoga;Password=masterkey");
+                options.UseNpgsql("Host=localhost; Port=5432;Username=postgres;Database=yoga;Password=masterkey");
             }
         }
     }

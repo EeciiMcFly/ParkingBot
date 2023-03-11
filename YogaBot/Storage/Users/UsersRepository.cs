@@ -6,7 +6,7 @@ public interface IUsersRepository
 {
 	Task<UserData?> GetUserAsync(long telegramUserId);
 
-	Task AddNewUserAsync(UserData userData);
+	Task AddUserAsync(UserData userData);
 
 	Task UpdateUserAsync(UserData user);
 }
@@ -27,7 +27,7 @@ public class UsersRepository : IUsersRepository
 		return userData;
 	}
 
-	public async Task AddNewUserAsync(UserData userData)
+	public async Task AddUserAsync(UserData userData)
 	{
 		await _storageDbContext.Users.AddAsync(userData);
 

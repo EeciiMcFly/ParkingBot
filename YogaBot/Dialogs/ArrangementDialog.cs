@@ -4,6 +4,7 @@ using YogaBot.Frames;
 using YogaBot.MessageQueue;
 using Telegram.Bot.Types.ReplyMarkups;
 using YogaBot.Storage.Arrangements;
+using YogaBot.Storage.UserArrangementRelations;
 using YogaBot.Storage.Users;
 
 namespace YogaBot.Dialogs;
@@ -13,15 +14,17 @@ public class ArrangementDialog : IDialog<BotContext>
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
     private readonly IArrangementRepository arrangementRepository;
+    private readonly IUserArrangementRelationsRepository userArrangementRelationsRepository;
     private readonly IUsersRepository usersRepository;
     
     public ArrangementDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
-        IArrangementRepository arrangementRepository, IUsersRepository usersRepository)
+        IArrangementRepository arrangementRepository, IUsersRepository usersRepository, IUserArrangementRelationsRepository userArrangementRelationsRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
         this.dialogStateSetter = dialogStateSetter;
         this.arrangementRepository = arrangementRepository;
         this.usersRepository = usersRepository;
+        this.userArrangementRelationsRepository = userArrangementRelationsRepository;
     }
 
     public async void StartDialog(BotContext context)
@@ -29,14 +32,16 @@ public class ArrangementDialog : IDialog<BotContext>
         /*var eventCount = 1;
         var ggg = eventCount > 6 ? ConstructPluralFindParkingFrame() : ConstructSingleFindParkingFrame();*/
 
-        var innerUserId = await usersRepository.GetUserAsync(context.TelegramUserId) 
+        var innerUserId = await usersRepository.GetUserAsync(context.TelegramUserId)
             ?? throw new Exception("You do not exist");
-        var arrangements = await arrangementRepository.GetArrangementForUserAsync(innerUserId.Id);
+
+        var relations = await userArrangementRelationsRepository.GetRelationsForUserAsync(innerUserId.Id);
+        var arrangements = await Task.WhenAll(relations.Select(x => arrangementRepository.GetArrangementAsync(x.ArrangementId)));
 
         var ikm = new InlineKeyboardMarkup(new[]
         {
-            arrangements.Select(x => InlineKeyboardButton.WithCallbackData(x.Name, x.Id.ToString()))
-                .Concat(new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.Back)})
+            new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.Back)}
+                .Concat(arrangements.Select(x => InlineKeyboardButton.WithCallbackData(x.Name, CallbackDataConstants.SelectArrangement + "/" + x.Id)))
         });
         
         var answer = new FrameState
@@ -44,7 +49,7 @@ public class ArrangementDialog : IDialog<BotContext>
             ChatId = context.ChatId,
             MessageId = context.MessageId,
             MessageType = MessageType.Change,
-            MessageText = "Тут твои события",
+            MessageText = "Тут твои мероприятия",
             Ikm = ikm
         };
 
@@ -60,7 +65,7 @@ public class ArrangementDialog : IDialog<BotContext>
         return context.CallbackData.Equals(CallbackDataConstants.MyActivities);
     }
 
-    public void ProcessArrangementId(BotContext context)
+    public async void ProcessArrangementId(BotContext context)
     {
         if (context.CallbackData.Equals(CallbackDataConstants.Back))
         {
@@ -68,13 +73,18 @@ public class ArrangementDialog : IDialog<BotContext>
             return;
         }
 
-        if (context.CallbackData.Equals("yoga_id"))
+        if (context.CallbackData.Contains(CallbackDataConstants.SelectArrangement))
         {
+            var arrangementGuid = new Guid(context.CallbackData.Split('/')[1]);
+            var arrangement = await arrangementRepository.GetArrangementAsync(arrangementGuid);
+            
             var ikm = new InlineKeyboardMarkup(new[]
             {
                 new[]
                 {
-                    InlineKeyboardButton.WithCallbackData("Создать событие", CallbackDataConstants.CreateEvent+"yoga_id"),
+                    InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid),
+                    InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid),
+                    InlineKeyboardButton.WithCallbackData("Удалить занятие", CallbackDataConstants.DeleteEvent + '/' + arrangementGuid),
                 },
             });
             var answer = new FrameState
@@ -82,7 +92,7 @@ public class ArrangementDialog : IDialog<BotContext>
                 ChatId = context.ChatId,
                 MessageId = context.MessageId,
                 MessageType = MessageType.Change,
-                MessageText = "Создайте событие",
+                MessageText = arrangement.Name,
                 Ikm = ikm
             };
             

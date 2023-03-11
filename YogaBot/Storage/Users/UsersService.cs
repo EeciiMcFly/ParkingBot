@@ -26,7 +26,7 @@ public class UsersService : IUsersService
 				TelegramUserId = telegramUserId,
 			};
 
-			await _usersRepository.AddNewUserAsync(newUserData);
+			await _usersRepository.AddUserAsync(newUserData);
 
 			var createdUser = await _usersRepository.GetUserAsync(telegramUserId);
 

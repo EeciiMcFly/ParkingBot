@@ -4,7 +4,7 @@ namespace YogaBot.Storage.Arrangements
 {
     public interface IArrangementRepository
     {
-        Task<IEnumerable<ArrangementData?>> GetArrangementForUserAsync(long userId);
+        Task<ArrangementData?> GetArrangementAsync(Guid arrangementId);
 
         Task AddArrangementAsync(ArrangementData userData);
     }
@@ -18,9 +18,9 @@ namespace YogaBot.Storage.Arrangements
             _userDbContext = userDbContext;
         }
 
-        public async Task<IEnumerable<ArrangementData?>> GetArrangementForUserAsync(long userId)
+        public async Task<ArrangementData?> GetArrangementAsync(Guid arrangementId)
         {
-            var arrangementData = await _userDbContext.Arrangements.Where(data => data.Id == userId).ToListAsync();
+            var arrangementData = await _userDbContext.Arrangements.FirstOrDefaultAsync(data => data.Id == arrangementId);
 
             return arrangementData;
         }

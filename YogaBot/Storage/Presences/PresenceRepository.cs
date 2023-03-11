@@ -4,9 +4,9 @@ namespace YogaBot.Storage.Presences
 {
     public interface IPresenceRepository
     {
-        Task<IEnumerable<PresenceData?>> GetPresencesForUserAsync(long userId);
+        Task<IEnumerable<PresenceData?>> GetPresencesForUserAsync(Guid userId);
 
-        Task<IEnumerable<PresenceData?>> GetPresencesForEventAsync(long eventId);
+        Task<IEnumerable<PresenceData?>> GetPresencesForEventAsync(Guid eventId);
 
         Task AddPresenceAsync(PresenceData presenceData);
     }
@@ -20,14 +20,14 @@ namespace YogaBot.Storage.Presences
             _userDbContext = userDbContext;
         }
 
-        public async Task<IEnumerable<PresenceData?>> GetPresencesForUserAsync(long userId)
+        public async Task<IEnumerable<PresenceData?>> GetPresencesForUserAsync(Guid userId)
         {
             var relationsData = await _userDbContext.Presences.Where(data => data.UserId == userId).ToListAsync();
 
             return relationsData;
         }
         
-        public async Task<IEnumerable<PresenceData?>> GetPresencesForEventAsync(long eventId)
+        public async Task<IEnumerable<PresenceData?>> GetPresencesForEventAsync(Guid eventId)
         {
             var relationsData = await _userDbContext.Presences.Where(data => data.EventId == eventId).ToListAsync();
 

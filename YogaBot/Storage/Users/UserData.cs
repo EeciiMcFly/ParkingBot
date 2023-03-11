@@ -5,7 +5,7 @@ namespace YogaBot.Storage.Users;
 [Index(nameof(TelegramUserId))]
 public class UserData
 {
-	public long Id { get; set; }
+	public Guid Id { get; set; }
 
 	public long TelegramUserId { get; set; }
 }

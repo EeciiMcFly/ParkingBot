@@ -2,9 +2,7 @@
 {
     public class ArrangementData
     {
-        public long Id { get; set; }
-        
-        public long OwnerId { get; set; }
+        public Guid Id { get; set; }
 
         public string Name { get; set; }
 

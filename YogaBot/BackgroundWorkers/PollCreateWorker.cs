@@ -1,17 +1,24 @@
-﻿using YogaBot.Frames;
+﻿using System.Text;
+using Telegram.Bot;
+using YogaBot.Frames;
 using YogaBot.MessageQueue;
 using YogaBot.Models.Poll;
+using YogaBot.Storage.Events;
 
 namespace YogaBot.BackgroundWorkers;
 
 public class PollCreateWorker : IHostedService
 {
     private readonly IOutputMessageQueue outputMessageQueue;
-    private CancellationTokenSource cancellationTokenSource = new ();
+    private readonly IServiceProvider serviceProvider;
+    private readonly TelegramBotClient telegramBotClient;
+    private CancellationTokenSource cancellationTokenSource = new();
 
-    public PollCreateWorker(IOutputMessageQueue outputMessageQueue)
+    public PollCreateWorker(IOutputMessageQueue outputMessageQueue, IServiceProvider serviceProvider, TelegramBotClient telegramBotClient)
     {
         this.outputMessageQueue = outputMessageQueue;
+        this.serviceProvider = serviceProvider;
+        this.telegramBotClient = telegramBotClient;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -28,25 +35,52 @@ public class PollCreateWorker : IHostedService
     {
         while (!cancellationTokenSource.Token.IsCancellationRequested)
         {
-            //проверяем что надо отправить голосование
-            if (false)
-            {
-                var poll = new Poll
-                {
-                    Answer = "Текст вопроса",
-                    Options = new[] { "Ответ 1", "Ответ 2" },
-                    AllowsMultipleAnswers = false,
-                    IsAnonymous = false,
-                    CloseDate = DateTime.UtcNow.AddHours(4)
-                };
+            var utcNow = DateTime.UtcNow;
+            var date = new DateTime(utcNow.Year, utcNow.Month, utcNow.AddDays(1).Day, 11, 59, 0, DateTimeKind.Utc);
+            using var scope = serviceProvider.CreateAsyncScope();
+            var eventsRepository = scope.ServiceProvider.GetService(typeof(IEventsRepository)) as IEventsRepository;
+            var events = await eventsRepository.GetEventsForDate(date);
 
-                var message = new FrameState
+            if (events.Any())
+            {
+                foreach (var @event in events)
                 {
-                    Poll = poll,
-                    ChatId = 12345 //id чата из базы,
-                };
-                
-                outputMessageQueue.AddMessage(message);
+                    if (@event.PollSend)
+                        continue;
+
+                    if (@event.Date.Subtract(DateTime.UtcNow).Duration() < TimeSpan.FromMinutes(5))
+                    {
+                        var stringBuilder = new StringBuilder();
+                        stringBuilder.AppendLine(@event.Name);
+                        if (@event.Cost > 0)
+                            stringBuilder.AppendLine($"Стоимость: {@event.Cost}");
+                        stringBuilder.AppendLine("Идешь?");
+                        var poll = new Poll
+                        {
+                            Answer = stringBuilder.ToString(),
+                            Options = new[] { "Да", "Нет" },
+                            AllowsMultipleAnswers = false,
+                            IsAnonymous = false,
+                            CloseDate = DateTime.UtcNow.AddHours(8)
+                        };
+
+                        var messageWithPoll = new FrameState
+                        {
+                            Poll = poll,
+                            ChatId = @event.Arrangement.ChatId,
+                            MessageType = MessageType.Poll
+                        };
+
+                        var pool = messageWithPoll.Poll;
+                        var message = await telegramBotClient.SendPollAsync(messageWithPoll.ChatId, pool.Answer, pool.Options,
+                            isAnonymous: pool.IsAnonymous, allowsMultipleAnswers: pool.AllowsMultipleAnswers);
+
+                        @event.PollSend = true;
+                        @event.PollMessageId = message.MessageId;
+                        @event.PollId = message.Poll.Id;
+                        await eventsRepository.UpdateAsync(@event);
+                    }
+                }
             }
 
             await Task.Delay(1000 * 60, cancellationTokenSource.Token);

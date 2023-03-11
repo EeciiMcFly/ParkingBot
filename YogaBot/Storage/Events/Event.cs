@@ -16,6 +16,11 @@ namespace YogaBot.Storage.Events
 
         public int Cost { get; set; }
 
+        public bool PollSend { get; set; }
+
+        public long? PollMessageId { get; set; }
+        public string? PollId { get; set; }
+
         public virtual Arrangement Arrangement { get; set; }
     }
 }

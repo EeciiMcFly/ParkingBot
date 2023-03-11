@@ -9,9 +9,9 @@ using YogaBot.Storage.Events;
 using YogaBot.Storage.Presences;
 using YogaBot.Storage.Users;
 
-namespace YogaBot.Dialogs.EventProcessings;
+namespace YogaBot.Dialogs.EventProcessings.Calculations;
 
-public class CalculateEventDialog : IDialog<BotContext>
+public class CalculateForRequesterEventDialog : IDialog<BotContext>
 {
     private readonly IOutputMessageQueue outputMessageQueue;
     private readonly IDialogStateSetter dialogStateSetter;
@@ -20,7 +20,7 @@ public class CalculateEventDialog : IDialog<BotContext>
     private readonly IUsersRepository usersRepository;
     private readonly IPresenceRepository presenceRepository;
 
-    public CalculateEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
+    public CalculateForRequesterEventDialog(IOutputMessageQueue outputMessageQueue, IDialogStateSetter dialogStateSetter, 
         IEventsRepository eventsRepository, IArrangementRepository arrangementRepository, IUsersRepository usersRepository, IPresenceRepository presenceRepository)
     {
         this.outputMessageQueue = outputMessageQueue;
@@ -50,7 +50,7 @@ public class CalculateEventDialog : IDialog<BotContext>
         if (context.CallbackData == null)
             return false;
             
-        return context.CallbackData.Contains(CallbackDataConstants.CalculatePrice);
+        return context.CallbackData.Contains(CallbackDataConstants.CalculatePriceForRequester);
     }
 
     public int Priority => 10;
@@ -61,10 +61,20 @@ public class CalculateEventDialog : IDialog<BotContext>
         var splittedText = context.MessageText.Split("\n");
         var startDate = DateTime.Parse(splittedText[0]).ToUniversalTime();
         var endDate = DateTime.Parse(splittedText[1]).ToUniversalTime();
-
-        var events = (await eventsRepository.GetEventsForPeriodAndArrangementAsync(startDate, endDate, arrangementGuid)).ToArray();
         
-        var costs = await Task.WhenAll(events.Select(async x =>
+        var visitedEvents = (await eventsRepository.GetEventsForPeriodAndArrangementAsync(startDate, endDate, arrangementGuid)).Where(@event =>
+        {
+            var presencesInEvent = presenceRepository.GetPresencesForEventAsync(@event.EventId).GetAwaiter().GetResult(); // pizdec
+            var user = usersRepository.GetUserAsync(context.TelegramUserId).GetAwaiter().GetResult();
+            if (presencesInEvent.FirstOrDefault(x => x.UserId == user.UserId) != null)
+            {
+                return true;
+            }
+
+            return false;
+        }).ToArray();
+        
+        var costs = await Task.WhenAll(visitedEvents.Select(async x =>
         {
             var presencesCount = (await presenceRepository.GetPresencesForEventAsync(x.EventId)).Count();
             return (double)x.Cost / presencesCount;
@@ -74,7 +84,7 @@ public class CalculateEventDialog : IDialog<BotContext>
         {
             new[] {InlineKeyboardButton.WithCallbackData("Запланировать занятие", CallbackDataConstants.CreateEvent + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Посмотреть запланированные занятия", CallbackDataConstants.GetEvents + '/' + arrangementGuid)},
-            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)},
+            new[] {InlineKeyboardButton.WithCallbackData("Рассчитать стоимость", CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementGuid)},
             new[] {InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)}
         });
         

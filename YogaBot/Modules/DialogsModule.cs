@@ -2,6 +2,7 @@
 using YogaBot.Dialogs;
 using YogaBot.Dialogs.ArrangementProcessings;
 using YogaBot.Dialogs.EventProcessings;
+using YogaBot.Dialogs.EventProcessings.Calculations;
 
 namespace YogaBot.Modules;
 
@@ -29,8 +30,8 @@ public class DialogsModule : Module
             .As<IDialog<BotContext>>()
             .SingleInstance();
         
-        builder.RegisterType<CalculateEventDialog>()
-            .As<CalculateEventDialog>()
+        builder.RegisterType<CalculateForRequesterEventDialog>()
+            .As<CalculateForRequesterEventDialog>()
             .As<IDialog<BotContext>>()
             .SingleInstance();
         

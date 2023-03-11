@@ -47,7 +47,7 @@ public class GetEventsDialog : IDialog<BotContext>
                 CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)});
         }
         ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Сколько я должен?", 
-            CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)});
+            CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementGuid)});
         ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)});
 
         foreach (var eventData in events)

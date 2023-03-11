@@ -87,7 +87,7 @@ public class CreateEventDialog : IDialog<BotContext>
             new[]
             {
                 InlineKeyboardButton.WithCallbackData("Рассчитать стоимость",
-                    CallbackDataConstants.CalculatePrice + '/' + arrangementId)
+                    CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementId)
             },
             new[] { InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities) }
         });

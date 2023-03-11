@@ -9,7 +9,8 @@ public static class CallbackDataConstants
     public const string SelectArrangement = "selectArrangement";
     public const string GetEvents = "getEvents";
     public const string DeleteEvent = "deleteEvent";
-    public const string CalculatePrice = "calculatePrice";
+    public const string CalculatePriceForRequester = "calculatePriceForRequester";
+    public const string CalculatePriceForAll = "calculatePriceForAll";
     public const string Back = "back";
     public const string Start = "start";
 }

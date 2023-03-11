@@ -45,7 +45,7 @@ public class ArrangementDialog : IDialog<BotContext>
                 CallbackDataConstants.DeleteEvent + '/' + arrangementGuid)});
         }
         ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Сколько я должен?", 
-            CallbackDataConstants.CalculatePrice + '/' + arrangementGuid)});
+            CallbackDataConstants.CalculatePriceForRequester + '/' + arrangementGuid)});
         ikm.Add(new[]{InlineKeyboardButton.WithCallbackData("Назад", CallbackDataConstants.AllActivities)});
 
         var answer = new FrameState

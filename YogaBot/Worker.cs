@@ -3,7 +3,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using YogaBot.MessageQueue;
-using YogaBot.MessagesProcessors;
+using YogaBot.Models.ChatMember;
 
 namespace YogaBot;
 
@@ -17,7 +17,7 @@ public class Worker : IHostedService
 
 	public Worker(TelegramBotClient telegramBotClient, IServiceProvider serviceProvider,
 		IInputMessageQueue inputMessageQueue, IMessageSender messageSender,
-		IMessageQueueProcessor messagesProcessor)
+		IMessageQueueProcessor messagesProcessor, IChatMemberProcessor chatMemberProcessor)
 	{
 		this.serviceProvider = serviceProvider;
 		this.telegramBotClient = telegramBotClient;
@@ -32,6 +32,15 @@ public class Worker : IHostedService
 		{
 			if (update.Message != null)
 			{
+				if (update.Message.Type == MessageType.ChatMemberLeft ||
+				    update.Message.Type == MessageType.ChatMembersAdded)
+				{
+					using var scope = serviceProvider.CreateAsyncScope();
+					var chatMemberProcessor = scope.ServiceProvider.GetService(typeof(IChatMemberProcessor)) as IChatMemberProcessor;
+					chatMemberProcessor.ProcessChatMember(update);
+					return;
+				}
+
 				var messageContext = new BotContext
 				{
 					ChatId = update.Message.Chat.Id,
@@ -55,6 +64,13 @@ public class Worker : IHostedService
 				};
 				
 				inputMessageQueue.AddMessage(messageContext);
+			}
+
+			if (update.Type == UpdateType.MyChatMember)
+			{
+				using var scope = serviceProvider.CreateAsyncScope();
+				var chatMemberProcessor = scope.ServiceProvider.GetService(typeof(IChatMemberProcessor)) as IChatMemberProcessor;
+				chatMemberProcessor.ProcessChatAsync(update);
 			}
 		}
 		catch (Exception e)

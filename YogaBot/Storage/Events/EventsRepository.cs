@@ -11,6 +11,10 @@ namespace YogaBot.Storage.Events
         Task AddEventAsync(Event @event);
 
         Task DeleteEventAsync(long eventId);
+
+        Task DeleteEventAsync(Event @event);
+
+        Task DeleteEventForArrangementAsync(long arrangementId);
     }
     
     public class EventsRepository : IEventsRepository
@@ -40,6 +44,19 @@ namespace YogaBot.Storage.Events
         {
             var deletedEvent = await _userDbContext.Events.FirstOrDefaultAsync(data => data.EventId == eventId);
             var eventData = _userDbContext.Events.Remove(deletedEvent);
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteEventAsync(Event @event)
+        {
+            var eventData = _userDbContext.Events.Remove(@event);
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteEventForArrangementAsync(long arrangementId)
+        {
+            var events = await _userDbContext.Events.Where(data => data.ArrangementId == arrangementId).ToListAsync();
+            _userDbContext.RemoveRange(events);
             await _userDbContext.SaveChangesAsync();
         }
 

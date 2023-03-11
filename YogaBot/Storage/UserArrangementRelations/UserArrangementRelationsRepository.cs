@@ -9,6 +9,10 @@ namespace YogaBot.Storage.UserArrangementRelations
         Task<IEnumerable<UserArrangementRelation?>> GetRelationsForArrangementAsync(long arrangementId);
 
         Task AddUserEventRelationAsync(UserArrangementRelation userArrangementRelation);
+
+        Task DeleteRelationByArrangementId(long arrangementId);
+
+        Task DeleteRelationByArrangementIdAndUserId(long arrangementId, long userId);
     }
     
     public class UserArrangementRelationsRepository : IUserArrangementRelationsRepository
@@ -38,6 +42,20 @@ namespace YogaBot.Storage.UserArrangementRelations
         {
             await _userDbContext.UserEventRelations.AddAsync(userArrangementRelation);
 
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteRelationByArrangementId(long arrangementId)
+        {
+            var userArrangementRelations = await _userDbContext.UserEventRelations.Where(data => data.ArrangementId == arrangementId).ToListAsync();
+            _userDbContext.RemoveRange(userArrangementRelations);
+            await _userDbContext.SaveChangesAsync();
+        }
+
+        public async Task DeleteRelationByArrangementIdAndUserId(long arrangementId, long userId)
+        {
+            var userArrangementRelations = await _userDbContext.UserEventRelations.FirstOrDefaultAsync(data => data.UserId == userId && data.ArrangementId == arrangementId);
+            _userDbContext.Remove(userArrangementRelations);
             await _userDbContext.SaveChangesAsync();
         }
     }

@@ -57,7 +57,7 @@ public class DefaultDialog : IDialog<BotContext>
 
     public bool CanProcess(BotContext context)
     {
-        return true;
+        return false;
     }
 
     public int Priority => 0;
